@@ -1,0 +1,33 @@
+# Ignore sensitive files
+.env
+firebase-cred.json
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
+
+# Ignore dependency directories
+/vendor/
+
+# Ignore compiled files
+*.exe
+*.o
+*.so
+
+# Ignore Go-specific files
+*.log
+*.out
+
+# Ignore IDE-specific files
+.idea/
+.vscode/
+*.iml
+
+# Ignore cache and temporary files
+*.tmp
+*.swp
+*.swo
+
+# Ignore build artifacts
+bin/
+dist/
