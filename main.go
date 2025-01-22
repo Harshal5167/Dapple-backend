@@ -6,7 +6,10 @@ import (
 )
 
 func main() {
-	app := app.Initialize()
-	config.InitializeFirebaseApp()
-	app.Listen(":5000")
+	firebaseApp,_ := config.InitializeFirebaseApp()
+
+	config := config.NewConfig(firebaseApp)
+
+	app:= app.NewApp(config)
+	app.Fiber.Listen(":5000")
 }
