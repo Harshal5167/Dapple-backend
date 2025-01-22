@@ -11,5 +11,5 @@ func main() {
 	config := config.NewConfig(firebaseApp)
 
 	app:= app.NewApp(config)
-	app.Fiber.Listen(":5000")
+	app.Fiber.Listen(":8000")
 }

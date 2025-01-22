@@ -16,6 +16,8 @@ type App struct {
 	authRepo    interfaces.AuthRepository
 	authService interfaces.AuthService
 	authRoute   interfaces.AuthRoutes
+	geminiService interfaces.GeminiService
+    geminiRoute   *routes.GeminiRoutes
 }
 
 func NewApp(config *config.Config) *App {
@@ -35,10 +37,18 @@ func (a *App) setupRepositories() {
 
 func (a *App) setupServices() {
 	a.authService = service.NewAuthService(a.authRepo)
+	a.geminiService = service.NewGeminiService(a.config.GeminiModel)
+
 }
 
+
 func (a *App) setupRoutes() {
-	authHandler := handler.NewAuthHandler(a.authService)
-	a.authRoute = routes.NewAuthRoute(authHandler)
-	a.authRoute.AuthRoutes(a.Fiber)
+    authHandler := handler.NewAuthHandler(a.authService)
+    geminiHandler := handler.NewGeminiHandler(a.geminiService)
+    
+    a.authRoute = routes.NewAuthRoute(authHandler)
+    a.geminiRoute = routes.NewGeminiRoutes(geminiHandler)
+    
+    a.authRoute.AuthRoutes(a.Fiber)
+    a.geminiRoute.SetupRoutes(a.Fiber)
 }
