@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	firebase "firebase.google.com/go/v4"
+	"firebase.google.com/go/v4/db"
 	"github.com/Harshal5167/Dapple/internal/model"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -36,19 +37,30 @@ func (c *AuthRepository) CheckExistingEmail(email string) (bool, error) {
 	return len(users) > 0, nil
 }
 
-func (c *AuthRepository) CreateNewUser(email string, password string) (string, error) {
+func (c *AuthRepository) CreateNewUser(params map[string]interface{}) (string, error) {
 	ctx := context.Background()
 
+	fmt.Println(params)
 	client, err := c.FirebaseApp.Database(ctx)
 	if err != nil {
 		return "", fmt.Errorf("failed to get Realtime Database client: %v", err)
 	}
 
-	ref, err := client.NewRef("users").Push(ctx, map[string]interface{}{
-		"email":    email,
-		"password": password,
-	})
-
+	var ref *db.Ref
+	if params["password"] != "" {
+		ref, err = client.NewRef("users").Push(ctx, map[string]interface{}{
+			"email":     params["email"],
+			"password":  params["password"],
+			"firstName": params["firstName"],
+			"lastName":  params["lastName"],
+		})
+	} else {
+		ref, err = client.NewRef("users").Push(ctx, map[string]interface{}{
+			"email":     params["email"],
+			"firstName": params["firstName"],
+			"lastName":  params["lastName"],
+		})
+	}
 	userId := ref.Key
 
 	if err != nil {

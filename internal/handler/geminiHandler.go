@@ -2,40 +2,40 @@
 package handler
 
 import (
-    "github.com/gofiber/fiber/v2"
-    "github.com/Harshal5167/Dapple/internal/interfaces"
+	"github.com/Harshal5167/Dapple/internal/interfaces"
+	"github.com/gofiber/fiber/v2"
 )
 
 type GeminiHandler struct {
-    geminiService interfaces.GeminiService
+	geminiService interfaces.GeminiService
 }
 
 func NewGeminiHandler(geminiService interfaces.GeminiService) *GeminiHandler {
-    return &GeminiHandler{
-        geminiService: geminiService,
-    }
+	return &GeminiHandler{
+		geminiService: geminiService,
+	}
 }
 
 func (h *GeminiHandler) EvaluateAnswer(c *fiber.Ctx) error {
-    var req interfaces.EvaluationRequest
-    if err := c.BodyParser(&req); err != nil {
-        return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-            "error": "Invalid request body",
-        })
-    }
+	var req interfaces.EvaluationRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid request body",
+		})
+	}
 
-    if req.Question == "" || req.UserAnswer == "" || len(req.EvaluationCriteria) == 0 {
-        return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-            "error": "Missing required fields",
-        })
-    }
+	if req.Question == "" || req.UserAnswer == "" || len(req.EvaluationCriteria) == 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Missing required fields",
+		})
+	}
 
-    resp, err := h.geminiService.EvaluateAnswer(c.Context(), &req)
-    if err != nil {
-        return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-            "error": err.Error(),
-        })
-    }
+	resp, err := h.geminiService.EvaluateAnswer(c.Context(), &req)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
 
-    return c.JSON(resp)
+	return c.JSON(resp)
 }

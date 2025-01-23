@@ -14,16 +14,11 @@ func NewAuthRoute(handler interfaces.AuthHandler) *AuthRoute {
 }
 
 func (r *AuthRoute) AuthRoutes(app *fiber.App) {
-
-
 	auth := app.Group("/auth")
-	// auth.Post("/register", func (c *fiber.Ctx) error {
-		
-	// })
 	auth.Post("/login", r.handler.Login)
 	auth.Post("/register", r.handler.Register)
 
-	// googleAuth := auth.Group("/google")
-	// googleAuth.Post("/register", )	
-	// googleAuth.Post("/login", )
+	googleAuth := auth.Group("/google")
+	googleAuth.Post("/register", r.handler.RegisterWithGoogle)
+	googleAuth.Post("/login", r.handler.LoginWithGoogle)
 }

@@ -11,13 +11,13 @@ import (
 )
 
 type App struct {
-	config      *config.Config
-	Fiber       *fiber.App
-	authRepo    interfaces.AuthRepository
-	authService interfaces.AuthService
-	authRoute   interfaces.AuthRoutes
+	config        *config.Config
+	Fiber         *fiber.App
+	authRepo      interfaces.AuthRepository
+	authService   interfaces.AuthService
+	authRoute     interfaces.AuthRoutes
 	geminiService interfaces.GeminiService
-    geminiRoute   *routes.GeminiRoutes
+	geminiRoute   *routes.GeminiRoutes
 }
 
 func NewApp(config *config.Config) (app *App) {
@@ -41,14 +41,13 @@ func (a *App) setupServices() {
 
 }
 
-
 func (a *App) setupRoutes() {
-    authHandler := handler.NewAuthHandler(a.authService)
-    geminiHandler := handler.NewGeminiHandler(a.geminiService)
-    
-    a.authRoute = routes.NewAuthRoute(authHandler)
-    a.geminiRoute = routes.NewGeminiRoutes(geminiHandler)
-    
-    a.authRoute.AuthRoutes(a.Fiber)
-    a.geminiRoute.SetupRoutes(a.Fiber)
+	authHandler := handler.NewAuthHandler(a.authService)
+	geminiHandler := handler.NewGeminiHandler(a.geminiService)
+
+	a.authRoute = routes.NewAuthRoute(authHandler)
+	a.geminiRoute = routes.NewGeminiRoutes(geminiHandler)
+
+	a.authRoute.AuthRoutes(a.Fiber)
+	a.geminiRoute.SetupRoutes(a.Fiber)
 }
