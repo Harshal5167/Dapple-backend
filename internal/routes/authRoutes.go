@@ -21,6 +21,7 @@ func (r *AuthRoute) AuthRoutes(app *fiber.App) {
 		
 	// })
 	auth.Post("/login", r.handler.Login)
+	auth.Post("/register", r.handler.Register)
 
 	// googleAuth := auth.Group("/google")
 	// googleAuth.Post("/register", )	

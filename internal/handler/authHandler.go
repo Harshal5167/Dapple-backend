@@ -3,7 +3,6 @@ package handler
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 
 	"github.com/Harshal5167/Dapple/internal/interfaces"
 	"github.com/Harshal5167/Dapple/internal/model"
@@ -18,7 +17,6 @@ func NewAuthHandler(authService interfaces.AuthService) *AuthHandler {
 	return &AuthHandler{authService}
 }
 
-
 func (h *AuthHandler) Login(c *fiber.Ctx) error{
 	var user = model.User{}
 	if err := json.NewDecoder(bytes.NewReader(c.Body())).Decode(&user); err != nil {
@@ -26,12 +24,42 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error{
 			"error": "Invalid input",
 		})
 	}
-	if (user.Username == "" || user.Email == "" || user.Password == "") {
+	if (user.Email == "" || user.Password == "") {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Username, Email and Password are required",
+			"error": "Email and Password are required",
 		})
 	}
-	h.authService.Login(user)
-	fmt.Print(user)
-	return c.SendString("Login")
+	token, err := h.authService.Login(user)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"token": token,
+	})
+}
+
+func (h *AuthHandler) Register(c *fiber.Ctx) error{
+	var user = model.User{}
+	if err := json.NewDecoder(bytes.NewReader(c.Body())).Decode(&user); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid input",
+		})
+	}
+	if (user.Email == "" || user.Password == "") {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Email and Password are required",
+		})
+	}
+	token,err:=h.authService.Register(user)
+	if err!=nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"token": token,
+	})
 }

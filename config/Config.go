@@ -45,15 +45,18 @@ func NewConfig(firebaseApp *firebase.App) *Config {
 
 func InitializeFirebaseApp() (*firebase.App, error) {
     err := godotenv.Load()
-    if err != nil {
-        panic("Error loading .env file")
-    }
+	if err != nil {
+		panic("Error loading .env file")
+	}
 
-    opt := option.WithCredentialsFile("config\\firebase-cred.json")
-    config := &firebase.Config{ProjectID: os.Getenv("PROJECT_ID")}
-    app, err := firebase.NewApp(context.Background(), config, opt)
-    if err != nil {
-        return nil, fmt.Errorf("error initializing app: %v", err)
-    }
-    return app, nil
+	opt := option.WithCredentialsFile("config\\firebase-cred.json")
+	config := &firebase.Config{
+		ProjectID:   os.Getenv("PROJECT_ID"),
+		DatabaseURL: os.Getenv("DATABASE_URL"),
+	}
+	app, err := firebase.NewApp(context.Background(), config, opt)
+	if err != nil {
+		return nil, fmt.Errorf("error initializing app: %v", err)
+	}
+	return app, nil
 }

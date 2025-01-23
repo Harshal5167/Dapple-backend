@@ -20,15 +20,15 @@ type App struct {
     geminiRoute   *routes.GeminiRoutes
 }
 
-func NewApp(config *config.Config) *App {
-	app := &App{
+func NewApp(config *config.Config) (app *App) {
+	app = &App{
 		config: config,
 		Fiber:  fiber.New(),
 	}
 	app.setupRepositories()
 	app.setupServices()
 	app.setupRoutes()
-	return app
+	return
 }
 
 func (a *App) setupRepositories() {
