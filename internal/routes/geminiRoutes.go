@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"github.com/Harshal5167/Dapple/internal/handler"
+	"github.com/Harshal5167/Dapple-backend/internal/handler"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -17,5 +17,6 @@ func NewGeminiRoutes(handler *handler.GeminiHandler) *GeminiRoutes {
 
 func (r *GeminiRoutes) SetupRoutes(app *fiber.App) {
 	api := app.Group("/api")
-	api.Post("/evaluate-answer", r.geminiHandler.EvaluateAnswer)
+	gemini := api.Group("/gemini")
+	gemini.Post("/evaluate-answer", r.geminiHandler.EvaluateAnswer)
 }

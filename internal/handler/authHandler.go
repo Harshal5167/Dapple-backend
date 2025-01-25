@@ -1,12 +1,8 @@
 package handler
 
 import (
-	"bytes"
-	"encoding/json"
-	// "fmt"
-
-	"github.com/Harshal5167/Dapple/internal/interfaces"
-	"github.com/Harshal5167/Dapple/internal/model"
+	"github.com/Harshal5167/Dapple-backend/internal/dto"
+	"github.com/Harshal5167/Dapple-backend/internal/interfaces"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -19,95 +15,49 @@ func NewAuthHandler(authService interfaces.AuthService) *AuthHandler {
 }
 
 func (h *AuthHandler) Login(c *fiber.Ctx) error {
-	var user = model.User{}
-	if err := json.NewDecoder(bytes.NewReader(c.Body())).Decode(&user); err != nil {
+	var reqBody *dto.LoginRequest
+
+	if err := c.BodyParser(&reqBody); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Invalid input",
 		})
 	}
-	if user.Email == "" || user.Password == "" {
+
+	if reqBody.Email == "" || reqBody.FirebaseToken == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Email and Password are required",
+			"error": "Required fields are missing",
 		})
 	}
-	token, err := h.authService.Login(user)
+	response, err := h.authService.Login(reqBody)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"token": token,
-	})
+
+	return c.Status(fiber.StatusOK).JSON(response)
 }
 
 func (h *AuthHandler) Register(c *fiber.Ctx) error {
-	var user = model.User{}
-	if err := json.NewDecoder(bytes.NewReader(c.Body())).Decode(&user); err != nil {
+	var reqBody *dto.RegisterRequest
+
+	if err := c.BodyParser(&reqBody); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Invalid input",
 		})
 	}
-	if user.Email == "" || user.Password == "" || user.FirstName == "" || user.LastName == "" {
+
+	if reqBody.Email == "" || reqBody.FirstName == "" || reqBody.LastName == "" || reqBody.FirebaseToken == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "First Name, Last Name, Email and Password are required",
+			"error": "Required fields are missing",
 		})
 	}
-	token, err := h.authService.Register(user)
+	response, err := h.authService.Register(reqBody)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
 
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"token": token,
-	})
-}
-
-func (h *AuthHandler) LoginWithGoogle(c *fiber.Ctx) error {
-	var user = model.User{}
-	if err := json.NewDecoder(bytes.NewReader(c.Body())).Decode(&user); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid input",
-		})
-	}
-	if user.Email == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Email is required",
-		})
-	}
-	token, err := h.authService.LoginWithGoogle(user)
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": err.Error(),
-		})
-	}
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"token": token,
-	})
-}
-
-func (h *AuthHandler) RegisterWithGoogle(c *fiber.Ctx) error {
-	var user = model.User{}
-	if err := json.NewDecoder(bytes.NewReader(c.Body())).Decode(&user); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid input",
-		})
-	}
-	if (user.Email == "" || user.FirstName == "" || user.LastName == "") {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "First Name, Last Name and Email are required",
-		})
-	}
-	token, err := h.authService.RegisterWithGoogle(user)
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": err.Error(),
-		})
-	}
-
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"token": token,
-	})
+	return c.Status(fiber.StatusOK).JSON(response)
 }

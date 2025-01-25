@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/Harshal5167/Dapple/config"
-	"github.com/Harshal5167/Dapple/internal/app"
+	"github.com/Harshal5167/Dapple-backend/config"
+	"github.com/Harshal5167/Dapple-backend/internal/app"
 )
 
 func main() {

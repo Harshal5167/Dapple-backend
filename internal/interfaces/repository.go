@@ -1,13 +1,11 @@
 package interfaces
 
 import (
-	"github.com/Harshal5167/Dapple/internal/model"
+	"github.com/Harshal5167/Dapple-backend/internal/model"
 )
 
 type AuthRepository interface {
-	CheckExistingEmail(email string) (bool, error)
-	CreateNewUser(params map[string]interface{}) (string, error)
-	GenerateCustomToken(uid string, user model.User) (string, error)
-	CheckPassword(email string, password string) error
-	GetUserIdFromEmail(email string) (string, error)
+	CreateNewUser(user model.User) (string, error)
+	GetUserDetailsFromEmail(email string) (model.User, error)
+	VerifyFirebaseToken(token string) (bool, error)
 }

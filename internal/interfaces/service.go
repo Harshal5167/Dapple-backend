@@ -1,10 +1,10 @@
 package interfaces
 
-import "github.com/Harshal5167/Dapple/internal/model"
+import (
+	"github.com/Harshal5167/Dapple-backend/internal/dto"
+)
 
 type AuthService interface {
-	Login(user model.User) (string, error)
-	Register(user model.User) (string, error)
-	RegisterWithGoogle(user model.User) (string, error)
-	LoginWithGoogle(user model.User) (string, error)
+	Login(reqBody *dto.LoginRequest) (*dto.AuthResponse, error)
+	Register(reqBody *dto.RegisterRequest) (*dto.AuthResponse, error)
 }

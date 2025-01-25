@@ -2,7 +2,8 @@
 package handler
 
 import (
-	"github.com/Harshal5167/Dapple/internal/interfaces"
+	"github.com/Harshal5167/Dapple-backend/internal/dto"
+	"github.com/Harshal5167/Dapple-backend/internal/interfaces"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -17,7 +18,7 @@ func NewGeminiHandler(geminiService interfaces.GeminiService) *GeminiHandler {
 }
 
 func (h *GeminiHandler) EvaluateAnswer(c *fiber.Ctx) error {
-	var req interfaces.EvaluationRequest
+	var req *dto.EvaluationRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Invalid request body",
@@ -30,7 +31,7 @@ func (h *GeminiHandler) EvaluateAnswer(c *fiber.Ctx) error {
 		})
 	}
 
-	resp, err := h.geminiService.EvaluateAnswer(c.Context(), &req)
+	resp, err := h.geminiService.EvaluateAnswer(c.Context(), req)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),

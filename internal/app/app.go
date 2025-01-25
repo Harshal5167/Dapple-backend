@@ -1,12 +1,12 @@
 package app
 
 import (
-	"github.com/Harshal5167/Dapple/config"
-	"github.com/Harshal5167/Dapple/internal/handler"
-	"github.com/Harshal5167/Dapple/internal/interfaces"
-	"github.com/Harshal5167/Dapple/internal/repository/auth"
-	"github.com/Harshal5167/Dapple/internal/routes"
-	"github.com/Harshal5167/Dapple/internal/service"
+	"github.com/Harshal5167/Dapple-backend/config"
+	"github.com/Harshal5167/Dapple-backend/internal/handler"
+	"github.com/Harshal5167/Dapple-backend/internal/interfaces"
+	"github.com/Harshal5167/Dapple-backend/internal/repository"
+	"github.com/Harshal5167/Dapple-backend/internal/routes"
+	"github.com/Harshal5167/Dapple-backend/internal/service"
 	"github.com/gofiber/fiber/v2"
 )
 

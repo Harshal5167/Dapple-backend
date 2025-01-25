@@ -4,7 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/Harshal5167/Dapple/internal/interfaces"
+
+	"github.com/Harshal5167/Dapple-backend/internal/dto"
+	"github.com/Harshal5167/Dapple-backend/internal/interfaces"
 	"github.com/google/generative-ai-go/genai"
 )
 
@@ -18,7 +20,7 @@ func NewGeminiService(client *genai.Client) interfaces.GeminiService {
 	}
 }
 
-func (s *geminiService) EvaluateAnswer(ctx context.Context, req *interfaces.EvaluationRequest) (*interfaces.EvaluationResponse, error) {
+func (s *geminiService) EvaluateAnswer(ctx context.Context, req *dto.EvaluationRequest) (*dto.EvaluationResponse, error) {
 	model := s.client.GenerativeModel("gemini-1.0-pro")
 
 	evalExample := "{\n    \"evaluation\": {\n"
@@ -65,10 +67,10 @@ Respond only with a JSON object in this exact format:
 		responseText += fmt.Sprintf("%v", part)
 	}
 
-	var response interfaces.EvaluationResponse
+	var response dto.EvaluationResponse
 	err = json.Unmarshal([]byte(responseText), &response)
 	if err != nil {
-		return &interfaces.EvaluationResponse{
+		return &dto.EvaluationResponse{
 			Evaluation: make(map[string]string),
 			Feedback:   make(map[string]string),
 			Error:      fmt.Sprintf("parsing error: %v", err),
