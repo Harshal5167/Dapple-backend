@@ -18,12 +18,15 @@ func NewAuthService(authRepository interfaces.AuthRepository) *AuthService {
 }
 
 func (c *AuthService) Login(reqBody *dto.LoginRequest) (*dto.AuthResponse, error) {
-	isVerified, err := c.authRepository.VerifyFirebaseToken(reqBody.FirebaseToken)
+	isVerified, tokenEmail, err := c.authRepository.VerifyFirebaseToken(reqBody.FirebaseToken)
 	if err != nil {
 		return nil, err
 	}
 	if !isVerified {
 		return nil, errors.New("firebase token is not verified")
+	}
+	if tokenEmail != reqBody.Email {
+		return nil, errors.New("email in token does not match email in request body")
 	}
 
 	user, err := c.authRepository.GetUserDetailsFromEmail(reqBody.Email)
@@ -47,12 +50,15 @@ func (c *AuthService) Login(reqBody *dto.LoginRequest) (*dto.AuthResponse, error
 }
 
 func (c *AuthService) Register(reqBody *dto.RegisterRequest) (*dto.AuthResponse, error) {
-	isVerified, err := c.authRepository.VerifyFirebaseToken(reqBody.FirebaseToken)
+	isVerified, tokenEmail, err := c.authRepository.VerifyFirebaseToken(reqBody.FirebaseToken)
 	if err != nil {
 		return nil, err
 	}
 	if !isVerified {
 		return nil, errors.New("firebase token is not verified")
+	}
+	if tokenEmail != reqBody.Email {
+		return nil, errors.New("email in token does not match email in request body")
 	}
 
 	userId, err := c.authRepository.CreateNewUser(model.User{

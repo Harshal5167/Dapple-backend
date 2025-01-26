@@ -17,4 +17,7 @@ func (r *AuthRoute) AuthRoutes(app *fiber.App) {
 	auth := app.Group("/auth")
 	auth.Post("/login", r.handler.Login)
 	auth.Post("/register", r.handler.Register)
+	auth.Get("/hello", func (c *fiber.Ctx) error {
+		return c.SendString("Hello, World!")
+	})
 }
