@@ -9,3 +9,7 @@ type AuthRoutes interface {
 type LevelRoutes interface {
 	LevelRoutes(app *fiber.App)
 }
+
+type SectionRoutes interface {
+	SectionRoutes(app *fiber.App) 
+}

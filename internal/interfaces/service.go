@@ -12,3 +12,7 @@ type AuthService interface {
 type LevelService interface {
 	AddLevel(req *dto.AddLevelRequest) (*dto.AddLevelResponse, error)
 }
+
+type SectionService interface {
+	AddSection(req *dto.AddSectionRequest) (*dto.AddSectionResponse, error)
+}

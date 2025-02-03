@@ -16,3 +16,7 @@ type EvaluationResponse struct {
 type AddLevelResponse struct {
 	LevelId string `json:"levelId"`
 }
+
+type AddSectionResponse struct {
+	SectionId string `json:"sectionId"`
+}

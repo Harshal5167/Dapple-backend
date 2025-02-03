@@ -19,7 +19,17 @@ type EvaluationRequest struct {
 }
 
 type AddLevelRequest struct {
-	Name        string   `json:"name"`
-	Description string   `json:"description"`
-	ImageUrl    string   `json:"imageUrl,omitempty"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	ImageUrl    string `json:"imageUrl,omitempty"`
+}
+
+type AddSectionRequest struct {
+	Name    string `json:"name"`
+	LevelId string `json:"levelId"`
+	TotalXP int    `json:"totalXP"`
+}
+
+type LinkSectionsRequest struct {
+	SectionIds []string `json:"sectionIds"`
 }

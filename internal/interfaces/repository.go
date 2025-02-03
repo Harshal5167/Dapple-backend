@@ -12,4 +12,9 @@ type AuthRepository interface {
 
 type LevelRepository interface {
 	AddLevel(level model.Level) (string, error)
+	AddSectionToLevel(levelId string, sectionId string) error
+}
+
+type SectionRepository interface {
+	AddSection(section model.Section) (string, error)
 }

@@ -32,3 +32,40 @@ func (c *LevelRepository) AddLevel(level model.Level) (string, error) {
 
 	return ref.Key, nil
 }
+
+func (c *LevelRepository) AddSectionToLevel(levelId string, sectionId string) error {
+	ctx := context.Background()
+
+	client, err := c.firebaseApp.Database(ctx)
+	if err != nil {
+		return err
+	}
+
+	ref := client.NewRef("levels").Child(levelId).Child("sections")
+	var sections []string
+	err = ref.Get(ctx, &sections)
+	if err != nil {
+		return err
+	}
+
+	var lastSectionId string
+	if len(sections) > 0 {
+		lastSectionId = sections[len(sections)-1]
+	} else {
+		lastSectionId = ""
+	}
+
+	if lastSectionId != "" {
+		err = client.NewRef("sections").Child(lastSectionId).Child("nextSection").Set(ctx, sectionId)
+		if err != nil {
+			return err
+		}
+	}
+
+	sections = append(sections, sectionId)
+	err = ref.Set(ctx, sections)
+	if err != nil {
+		return err
+	}
+	return nil
+}
