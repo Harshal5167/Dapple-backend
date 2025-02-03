@@ -9,3 +9,7 @@ type AuthRepository interface {
 	GetUserDetailsFromEmail(email string) (model.User, error)
 	VerifyFirebaseToken(token string) (bool, string, error)
 }
+
+type LevelRepository interface {
+	AddLevel(level model.Level) (string, error)
+}

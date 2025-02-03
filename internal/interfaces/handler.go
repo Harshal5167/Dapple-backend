@@ -6,3 +6,7 @@ type AuthHandler interface {
 	Login(c *fiber.Ctx) error
 	Register(c *fiber.Ctx) error
 }
+
+type LevelHandler interface {
+	AddLevel(c *fiber.Ctx) error
+}

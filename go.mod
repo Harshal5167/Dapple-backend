@@ -5,7 +5,7 @@ go 1.23.5
 require (
 	firebase.google.com/go/v4 v4.15.1
 	github.com/gofiber/fiber/v2 v2.52.6
-	github.com/golang-jwt/jwt v3.2.2+incompatible
+	github.com/golang-jwt/jwt/v4 v4.5.1
 	github.com/google/generative-ai-go v0.19.0
 	github.com/joho/godotenv v1.5.1
 	google.golang.org/api v0.217.0
@@ -26,7 +26,6 @@ require (
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
-	github.com/golang-jwt/jwt/v4 v4.5.1 // indirect
 	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/s2a-go v0.1.9 // indirect

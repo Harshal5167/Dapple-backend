@@ -17,3 +17,9 @@ type EvaluationRequest struct {
 	UserAnswer         string   `json:"user_answer"`
 	EvaluationCriteria []string `json:"evaluation_criteria"`
 }
+
+type AddLevelRequest struct {
+	Name        string   `json:"name"`
+	Description string   `json:"description"`
+	ImageUrl    string   `json:"imageUrl,omitempty"`
+}

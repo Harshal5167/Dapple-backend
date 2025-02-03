@@ -12,3 +12,7 @@ type EvaluationResponse struct {
 	Feedback   map[string]string `json:"feedback"`
 	Error      string            `json:"error,omitempty"`
 }
+
+type AddLevelResponse struct {
+	LevelId string `json:"levelId"`
+}

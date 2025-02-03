@@ -1,4 +1,4 @@
-package auth
+package repository
 
 import (
 	"context"
@@ -8,7 +8,6 @@ import (
 	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/db"
 	"github.com/Harshal5167/Dapple-backend/internal/model"
-	"github.com/Harshal5167/Dapple-backend/internal/utils"
 )
 
 type AuthRepository struct {
@@ -47,26 +46,17 @@ func (c *AuthRepository) GetUserDetailsFromEmail(email string) (model.User, erro
 	}
 
 	ref := client.NewRef("users")
-	var users map[string]map[string]interface{}
+	var users map[string]model.User
 
-	err = ref.OrderByChild("email").EqualTo(email).Get(ctx, &users)
+	err = ref.OrderByChild("email").EqualTo(email).LimitToFirst(1).Get(ctx, &users)
 	if err != nil {
 		return model.User{}, fmt.Errorf("error querying database: %v", err)
 	}
-	for key, userData := range users {
-		user := model.User{
-			UserId:    key,
-			Email:     utils.GetString(userData, "email"),
-			FirstName: utils.GetString(userData, "firstName"),
-			LastName:  utils.GetString(userData, "lastName"),
-			Age:       utils.GetInt(userData, "age"),
-			Role:      utils.GetString(userData, "role"),
-			XP:        utils.GetInt(userData, "XP"),
-			Badges:    utils.GetIntSlice(userData, "badges"),
-			Level:     utils.GetInt(userData, "levels"),
-			Section:   utils.GetInt(userData, "section"),
-		}
-		return user, nil
+
+	for user := range users {
+		userDetails := users[user]
+		userDetails.UserId = user
+		return userDetails, nil
 	}
 	return model.User{}, errors.New("unknown error occurred")
 }

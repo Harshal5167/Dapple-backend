@@ -1,7 +1,8 @@
 package model
 
-// type Level struct {
-// 	LevelId   string `json:"levelId"`
-// 	LevelName string `json:"levelName"`
-// 	section1 string `json:"section1"`
-// }
+type Level struct {
+	Name        string   `json:"name"`
+	Description string   `json:"description"`
+	ImageUrl    string   `json:"imageUrl,omitempty"`
+	Sections    []string `json:"sections"`
+}

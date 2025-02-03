@@ -4,7 +4,7 @@ import (
 	"github.com/Harshal5167/Dapple-backend/config"
 	"github.com/Harshal5167/Dapple-backend/internal/handler"
 	"github.com/Harshal5167/Dapple-backend/internal/interfaces"
-	"github.com/Harshal5167/Dapple-backend/internal/repository"
+	auth "github.com/Harshal5167/Dapple-backend/internal/repository"
 	"github.com/Harshal5167/Dapple-backend/internal/routes"
 	"github.com/Harshal5167/Dapple-backend/internal/service"
 	"github.com/gofiber/fiber/v2"
@@ -18,6 +18,9 @@ type App struct {
 	authRoute     interfaces.AuthRoutes
 	geminiService interfaces.GeminiService
 	geminiRoute   *routes.GeminiRoutes
+	levelRoute    interfaces.LevelRoutes
+	levelRepo     interfaces.LevelRepository
+	levelService  interfaces.LevelService
 }
 
 func NewApp(config *config.Config) (app *App) {
@@ -33,21 +36,25 @@ func NewApp(config *config.Config) (app *App) {
 
 func (a *App) setupRepositories() {
 	a.authRepo = auth.NewAuthRepository(a.config.FirebaseApp)
+	a.levelRepo = auth.NewLevelRepository(a.config.FirebaseApp)
 }
 
 func (a *App) setupServices() {
 	a.authService = service.NewAuthService(a.authRepo)
 	a.geminiService = service.NewGeminiService(a.config.GeminiModel)
-
+	a.levelService = service.NewLevelService(a.levelRepo)
 }
 
 func (a *App) setupRoutes() {
 	authHandler := handler.NewAuthHandler(a.authService)
 	geminiHandler := handler.NewGeminiHandler(a.geminiService)
+	levelHandler := handler.NewLevelHandler(a.levelService)
 
 	a.authRoute = routes.NewAuthRoute(authHandler)
 	a.geminiRoute = routes.NewGeminiRoutes(geminiHandler)
+	a.levelRoute = routes.NewLevelRoute(levelHandler)
 
 	a.authRoute.AuthRoutes(a.Fiber)
 	a.geminiRoute.SetupRoutes(a.Fiber)
+	a.levelRoute.LevelRoutes(a.Fiber)
 }

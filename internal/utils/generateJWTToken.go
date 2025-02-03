@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/Harshal5167/Dapple-backend/internal/model"
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/joho/godotenv"
 )
 
