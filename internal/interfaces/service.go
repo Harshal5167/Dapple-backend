@@ -16,3 +16,7 @@ type LevelService interface {
 type SectionService interface {
 	AddSection(req *dto.AddSectionRequest) (*dto.AddSectionResponse, error)
 }
+
+type QuestionService interface {
+	AddQuestion(req *dto.AddQuestionRequest) (*dto.AddQuestionResponse, error)
+}

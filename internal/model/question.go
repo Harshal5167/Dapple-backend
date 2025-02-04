@@ -8,7 +8,7 @@ const (
 )
 
 type Question struct {
-	Question      string       `json:"question"`
+	QuestionText  string       `json:"question"`
 	ImageUrl      string       `json:"imageUrl,omitempty"`
 	Type          QuestionType `json:"type"`
 	Options       []string     `json:"options,omitempty"`

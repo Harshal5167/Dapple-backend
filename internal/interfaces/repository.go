@@ -17,4 +17,9 @@ type LevelRepository interface {
 
 type SectionRepository interface {
 	AddSection(section model.Section) (string, error)
+	AddQuestionToSection(sectionId string, questionId string) error
+}
+
+type QuestionRepository interface {
+	AddQuestion(question model.Question) (string, error)
 }

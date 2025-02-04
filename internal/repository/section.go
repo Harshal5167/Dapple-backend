@@ -32,7 +32,7 @@ func (c *SectionRepository) AddSection(section model.Section) (string, error) {
 	return ref.Key, nil
 }
 
-func (c *SectionRepository) LinkSectionsById(sectionIds []string) error {
+func (c *SectionRepository) AddQuestionToSection(sectionId string, questionId string) error {
 	ctx := context.Background()
 
 	client, err := c.firebaseApp.Database(ctx)
@@ -40,12 +40,17 @@ func (c *SectionRepository) LinkSectionsById(sectionIds []string) error {
 		return err
 	}
 
-	ref := client.NewRef("sections")
-	for _, sectionId := range sectionIds {
-		err = ref.Child(sectionId).Set(ctx, true)
-		if err != nil {
-			return err
-		}
+	ref := client.NewRef("sections").Child(sectionId).Child("questions")
+	var questions []string
+	err = ref.Get(ctx, &questions)
+	if err != nil {
+		return err
+	}
+
+	questions = append(questions, questionId)
+	err = ref.Set(ctx, questions)
+	if err != nil {
+		return err
 	}
 	return nil
 }

@@ -20,3 +20,7 @@ type AddLevelResponse struct {
 type AddSectionResponse struct {
 	SectionId string `json:"sectionId"`
 }
+
+type AddQuestionResponse struct {
+	QuestionId string `json:"questionId"`
+}

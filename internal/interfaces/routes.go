@@ -11,5 +11,9 @@ type LevelRoutes interface {
 }
 
 type SectionRoutes interface {
-	SectionRoutes(app *fiber.App) 
+	SectionRoutes(app *fiber.App)
+}
+
+type QuestionRoutes interface {
+	QuestionRoutes(app *fiber.App)
 }
