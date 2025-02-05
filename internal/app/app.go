@@ -3,82 +3,67 @@ package app
 import (
 	"github.com/Harshal5167/Dapple-backend/config"
 	"github.com/Harshal5167/Dapple-backend/internal/handler"
-	"github.com/Harshal5167/Dapple-backend/internal/interfaces"
 	"github.com/Harshal5167/Dapple-backend/internal/repository"
 	"github.com/Harshal5167/Dapple-backend/internal/routes"
 	"github.com/Harshal5167/Dapple-backend/internal/service"
+	"github.com/Harshal5167/Dapple-backend/internal/types"
 	"github.com/gofiber/fiber/v2"
 )
 
 type App struct {
-	config          *config.Config
-	Fiber           *fiber.App
-	authRepo        interfaces.AuthRepository
-	authService     interfaces.AuthService
-	authRoute       interfaces.AuthRoutes
-	geminiService   interfaces.GeminiService
-	geminiRoute     *routes.GeminiRoutes
-	levelRoute      interfaces.LevelRoutes
-	levelRepo       interfaces.LevelRepository
-	levelService    interfaces.LevelService
-	sectionRoute    interfaces.SectionRoutes
-	sectionService  interfaces.SectionService
-	sectionRepo     interfaces.SectionRepository
-	questionRoute   interfaces.QuestionRoutes
-	questionService interfaces.QuestionService
-	questionRepo    interfaces.QuestionRepository
-	lessonRoute    interfaces.LessonRoutes
-	lessonService  interfaces.LessonService
-	lessonRepo     interfaces.LessonRepository
+	config       *config.Config
+	Fiber        *fiber.App
+	Repositories *types.Repositories
+	Services     *types.Services
+	Handler      *types.Handler
 }
 
 func NewApp(config *config.Config) (app *App) {
 	app = &App{
-		config: config,
-		Fiber:  fiber.New(),
+		config:       config,
+		Fiber:        fiber.New(),
+		Repositories: &types.Repositories{},
+		Services:     &types.Services{},
+		Handler:      &types.Handler{},
 	}
 	app.setupRepositories()
 	app.setupServices()
+	app.setupHandlers()
 	app.setupRoutes()
 	return
 }
 
 func (a *App) setupRepositories() {
-	a.authRepo = repository.NewAuthRepository(a.config.FirebaseApp)
-	a.levelRepo = repository.NewLevelRepository(a.config.FirebaseApp)
-	a.sectionRepo = repository.NewSectionRepository(a.config.FirebaseApp)
-	a.questionRepo = repository.NewQuestionRepository(a.config.FirebaseApp)
-	a.lessonRepo = repository.NewLessonRepository(a.config.FirebaseApp)
+	a.Repositories.AuthRepo = repository.NewAuthRepository(a.config.FirebaseApp)
+	a.Repositories.LevelRepo = repository.NewLevelRepository(a.config.FirebaseApp)
+	a.Repositories.SectionRepo = repository.NewSectionRepository(a.config.FirebaseApp)
+	a.Repositories.QuestionRepo = repository.NewQuestionRepository(a.config.FirebaseApp)
+	a.Repositories.LessonRepo = repository.NewLessonRepository(a.config.FirebaseApp)
 }
 
 func (a *App) setupServices() {
-	a.authService = service.NewAuthService(a.authRepo)
-	a.geminiService = service.NewGeminiService(a.config.GeminiModel)
-	a.levelService = service.NewLevelService(a.levelRepo)
-	a.sectionService = service.NewSectionService(a.sectionRepo, a.levelRepo)
-	a.questionService = service.NewQuestionService(a.questionRepo, a.sectionRepo)
-	a.lessonService = service.NewLessonService(a.lessonRepo, a.sectionRepo)
+	a.Services.AuthService = service.NewAuthService(a.Repositories.AuthRepo)
+	a.Services.GeminiService = service.NewGeminiService(a.config.GeminiModel)
+	a.Services.LevelService = service.NewLevelService(a.Repositories.LevelRepo)
+	a.Services.SectionService = service.NewSectionService(a.Repositories.SectionRepo, a.Repositories.LevelRepo)
+	a.Services.QuestionService = service.NewQuestionService(a.Repositories.QuestionRepo, a.Repositories.SectionRepo)
+	a.Services.LessonService = service.NewLessonService(a.Repositories.LessonRepo, a.Repositories.SectionRepo)
+}
+
+func (a *App) setupHandlers() {
+	a.Handler.AuthHandler = handler.NewAuthHandler(a.Services.AuthService)
+	a.Handler.GeminiHandler = handler.NewGeminiHandler(a.Services.GeminiService)
+	a.Handler.LevelHandler = handler.NewLevelHandler(a.Services.LevelService)
+	a.Handler.SectionHandler = handler.NewSectionHandler(a.Services.SectionService)
+	a.Handler.QuestionHandler = handler.NewQuestionHandler(a.Services.QuestionService)
+	a.Handler.LessonHandler = handler.NewLessonHandler(a.Services.LessonService)
 }
 
 func (a *App) setupRoutes() {
-	authHandler := handler.NewAuthHandler(a.authService)
-	geminiHandler := handler.NewGeminiHandler(a.geminiService)
-	levelHandler := handler.NewLevelHandler(a.levelService)
-	sectionHandler := handler.NewSectionHandler(a.sectionService)
-	questionHandler := handler.NewQuestionHandler(a.questionService)
-	lessonHandler := handler.NewLessonHandler(a.lessonService)
-
-	a.authRoute = routes.NewAuthRoute(authHandler)
-	a.geminiRoute = routes.NewGeminiRoutes(geminiHandler)
-	a.levelRoute = routes.NewLevelRoute(levelHandler)
-	a.sectionRoute = routes.NewSectionRoutes(sectionHandler)
-	a.questionRoute = routes.NewQuestionRoute(questionHandler)
-	a.lessonRoute = routes.NewLessonRoutes(lessonHandler)
-
-	a.authRoute.AuthRoutes(a.Fiber)
-	a.geminiRoute.SetupRoutes(a.Fiber)
-	a.levelRoute.LevelRoutes(a.Fiber)
-	a.sectionRoute.SectionRoutes(a.Fiber)
-	a.questionRoute.QuestionRoutes(a.Fiber)
-	a.lessonRoute.LessonRoutes(a.Fiber)
+	routes.NewAuthRoute(a.Handler.AuthHandler).AuthRoutes(a.Fiber)
+	routes.NewGeminiRoutes(a.Handler.GeminiHandler).SetupRoutes(a.Fiber)
+	routes.NewLevelRoute(a.Handler.LevelHandler).LevelRoutes(a.Fiber)
+	routes.NewSectionRoutes(a.Handler.SectionHandler).SectionRoutes(a.Fiber)
+	routes.NewQuestionRoute(a.Handler.QuestionHandler).QuestionRoutes(a.Fiber)
+	routes.NewLessonRoutes(a.Handler.LessonHandler).LessonRoutes(a.Fiber)
 }

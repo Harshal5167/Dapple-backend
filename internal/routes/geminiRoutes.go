@@ -1,16 +1,16 @@
 package routes
 
 import (
-	"github.com/Harshal5167/Dapple-backend/internal/handler"
+	"github.com/Harshal5167/Dapple-backend/internal/interfaces"
 	"github.com/Harshal5167/Dapple-backend/internal/middleware"
 	"github.com/gofiber/fiber/v2"
 )
 
 type GeminiRoutes struct {
-	geminiHandler *handler.GeminiHandler
+	geminiHandler interfaces.GeminiHandler
 }
 
-func NewGeminiRoutes(handler *handler.GeminiHandler) *GeminiRoutes {
+func NewGeminiRoutes(handler interfaces.GeminiHandler) *GeminiRoutes {
 	return &GeminiRoutes{
 		geminiHandler: handler,
 	}
