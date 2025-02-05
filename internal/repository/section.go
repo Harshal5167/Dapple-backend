@@ -54,3 +54,26 @@ func (c *SectionRepository) AddQuestionToSection(sectionId string, questionId st
 	}
 	return nil
 }
+
+func (c *SectionRepository) AddLessonToSection(sectionId string, lessonId string) error {
+	ctx := context.Background()
+
+	client, err := c.firebaseApp.Database(ctx)
+	if err != nil {
+		return err
+	}
+
+	ref := client.NewRef("sections").Child(sectionId).Child("lessons")
+	var lessons []string
+	err = ref.Get(ctx, &lessons)
+	if err != nil {
+		return err
+	}
+
+	lessons = append(lessons, lessonId)
+	err = ref.Set(ctx, lessons)
+	if err != nil {
+		return err
+	}
+	return nil
+}

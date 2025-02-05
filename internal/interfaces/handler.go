@@ -1,6 +1,8 @@
 package interfaces
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"github.com/gofiber/fiber/v2"
+)
 
 type AuthHandler interface {
 	Login(c *fiber.Ctx) error
@@ -17,4 +19,8 @@ type SectionHandler interface {
 
 type QuestionHandler interface {
 	AddQuestion(c *fiber.Ctx) error
+}
+
+type LessonHandler interface {
+	AddLesson(c *fiber.Ctx) error
 }

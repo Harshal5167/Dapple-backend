@@ -16,11 +16,14 @@ type EvaluationResponse struct {
 type AddLevelResponse struct {
 	LevelId string `json:"levelId"`
 }
-
 type AddSectionResponse struct {
 	SectionId string `json:"sectionId"`
 }
 
 type AddQuestionResponse struct {
 	QuestionId string `json:"questionId"`
+}
+
+type AddLessonResponse struct {
+	LessonId string `json:"lessonId"`
 }

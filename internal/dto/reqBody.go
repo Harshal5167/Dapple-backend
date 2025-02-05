@@ -35,3 +35,7 @@ type AddSectionRequest struct {
 type AddQuestionRequest struct {
 	model.Question
 }
+
+type AddLessonRequest struct {
+	model.Lesson
+}

@@ -20,3 +20,7 @@ type SectionService interface {
 type QuestionService interface {
 	AddQuestion(req *dto.AddQuestionRequest) (*dto.AddQuestionResponse, error)
 }
+
+type LessonService interface {
+	AddLesson(req *dto.AddLessonRequest) (*dto.AddLessonResponse, error)
+}

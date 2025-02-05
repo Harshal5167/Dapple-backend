@@ -27,6 +27,9 @@ type App struct {
 	questionRoute   interfaces.QuestionRoutes
 	questionService interfaces.QuestionService
 	questionRepo    interfaces.QuestionRepository
+	lessonRoute    interfaces.LessonRoutes
+	lessonService  interfaces.LessonService
+	lessonRepo     interfaces.LessonRepository
 }
 
 func NewApp(config *config.Config) (app *App) {
@@ -45,6 +48,7 @@ func (a *App) setupRepositories() {
 	a.levelRepo = repository.NewLevelRepository(a.config.FirebaseApp)
 	a.sectionRepo = repository.NewSectionRepository(a.config.FirebaseApp)
 	a.questionRepo = repository.NewQuestionRepository(a.config.FirebaseApp)
+	a.lessonRepo = repository.NewLessonRepository(a.config.FirebaseApp)
 }
 
 func (a *App) setupServices() {
@@ -53,6 +57,7 @@ func (a *App) setupServices() {
 	a.levelService = service.NewLevelService(a.levelRepo)
 	a.sectionService = service.NewSectionService(a.sectionRepo, a.levelRepo)
 	a.questionService = service.NewQuestionService(a.questionRepo, a.sectionRepo)
+	a.lessonService = service.NewLessonService(a.lessonRepo, a.sectionRepo)
 }
 
 func (a *App) setupRoutes() {
@@ -61,16 +66,19 @@ func (a *App) setupRoutes() {
 	levelHandler := handler.NewLevelHandler(a.levelService)
 	sectionHandler := handler.NewSectionHandler(a.sectionService)
 	questionHandler := handler.NewQuestionHandler(a.questionService)
+	lessonHandler := handler.NewLessonHandler(a.lessonService)
 
 	a.authRoute = routes.NewAuthRoute(authHandler)
 	a.geminiRoute = routes.NewGeminiRoutes(geminiHandler)
 	a.levelRoute = routes.NewLevelRoute(levelHandler)
 	a.sectionRoute = routes.NewSectionRoutes(sectionHandler)
 	a.questionRoute = routes.NewQuestionRoute(questionHandler)
+	a.lessonRoute = routes.NewLessonRoutes(lessonHandler)
 
 	a.authRoute.AuthRoutes(a.Fiber)
 	a.geminiRoute.SetupRoutes(a.Fiber)
 	a.levelRoute.LevelRoutes(a.Fiber)
 	a.sectionRoute.SectionRoutes(a.Fiber)
 	a.questionRoute.QuestionRoutes(a.Fiber)
+	a.lessonRoute.LessonRoutes(a.Fiber)
 }
