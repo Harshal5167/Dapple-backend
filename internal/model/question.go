@@ -12,7 +12,7 @@ type Question struct {
 	ImageUrl      string       `json:"imageUrl,omitempty"`
 	Type          QuestionType `json:"type"`
 	Options       []string     `json:"options,omitempty"`
-	CorrectOption int          `json:"correctOption,omitempty"`
+	CorrectOption int          `json:"correctOption,omitzero"`
 	BestAnswer    []string     `json:"bestAnswer,omitempty"`
 	SectionId     string       `json:"sectionId"`
 	Explanation   []string     `json:"explanation,omitempty"`

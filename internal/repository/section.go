@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 
 	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/db"
@@ -47,6 +48,10 @@ func (c *SectionRepository) AddQuestionToSection(sectionId string, questionId st
 		return err
 	}
 
+	if len(questions) == 4 {
+		return fmt.Errorf("section already has 4 questions")
+	}
+
 	questions = append(questions, questionId)
 	err = ref.Set(ctx, questions)
 	if err != nil {
@@ -68,6 +73,10 @@ func (c *SectionRepository) AddLessonToSection(sectionId string, lessonId string
 	err = ref.Get(ctx, &lessons)
 	if err != nil {
 		return err
+	}
+
+	if len(lessons) == 4 {
+		return fmt.Errorf("section already has 4 lessons")
 	}
 
 	lessons = append(lessons, lessonId)

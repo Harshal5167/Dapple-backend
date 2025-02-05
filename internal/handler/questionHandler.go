@@ -8,7 +8,7 @@ import (
 )
 
 type QuestionHandler struct {
-	questionService interfaces.QuestionService	
+	questionService interfaces.QuestionService
 }
 
 func NewQuestionHandler(questionService interfaces.QuestionService) *QuestionHandler {
@@ -25,9 +25,27 @@ func (h *QuestionHandler) AddQuestion(c *fiber.Ctx) error {
 		})
 	}
 
-	if req.QuestionText == "" || req.XP == 0 || req.SectionId == "" || (req.Type != model.Objective && req.Type != model.Subjective) {
+	if req.Type != model.Objective && req.Type != model.Subjective {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid question type",
+		})
+	}
+
+	if req.QuestionText == "" || req.XP == 0 || req.SectionId == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Missing or wrong fields",
+		})
+	}
+
+	if req.Type == model.Objective && (req.CorrectOption < 0 || req.CorrectOption >= len(req.Options) || len(req.Options) < 4 || len(req.Explanation) == 0) {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid objective question",
+		})
+	}
+
+	if req.Type == model.Subjective && (len(req.BestAnswer) == 0) {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid subjective question",
 		})
 	}
 

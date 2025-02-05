@@ -33,9 +33,21 @@ type AddSectionRequest struct {
 }
 
 type AddQuestionRequest struct {
-	model.Question
+	QuestionText  string             `json:"question"`
+	ImageUrl      string             `json:"imageUrl,omitempty"`
+	Type          model.QuestionType `json:"type"`
+	Options       []string           `json:"options,omitempty"`
+	CorrectOption int                `json:"correctOption,omitzero"`
+	BestAnswer    []string           `json:"bestAnswer,omitempty"`
+	SectionId     string             `json:"sectionId"`
+	Explanation   []string           `json:"explanation,omitempty"`
+	XP            int                `json:"xp"`
 }
 
 type AddLessonRequest struct {
-	model.Lesson
+	Title     string   `json:"title"`
+	Content   []string `json:"content"`
+	SectionId string   `json:"sectionId"`
+	XP        int      `json:"xp"`
+	ImageUrl  string   `json:"imageUrl,omitempty"`
 }
