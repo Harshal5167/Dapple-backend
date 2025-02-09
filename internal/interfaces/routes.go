@@ -21,3 +21,7 @@ type QuestionRoutes interface {
 type LessonRoutes interface {
 	LessonRoutes(app *fiber.App)
 }
+
+type UserCourseRoutes interface {
+	UserCourseRoutes(app *fiber.App)
+}

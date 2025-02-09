@@ -47,11 +47,20 @@ func (h *AuthHandler) Register(c *fiber.Ctx) error {
 		})
 	}
 
-	if reqBody.Email == "" || reqBody.FirstName == "" || reqBody.LastName == "" || reqBody.FirebaseToken == "" {
+	if reqBody.Email == "" ||
+		reqBody.FirstName == "" ||
+		reqBody.LastName == "" ||
+		reqBody.FirebaseToken == "" ||
+		reqBody.Age == 0 ||
+		reqBody.Gender == "" ||
+		reqBody.Profession == "" ||
+		len(reqBody.SocialChallenges) == 0 ||
+		len(reqBody.StrugglingSocialSetting) == 0 {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Required fields are missing",
 		})
 	}
+
 	response, err := h.authService.Register(reqBody)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{

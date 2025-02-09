@@ -1,6 +1,7 @@
 package interfaces
 
 import (
+	"github.com/Harshal5167/Dapple-backend/internal/dto"
 	"github.com/Harshal5167/Dapple-backend/internal/model"
 )
 
@@ -13,6 +14,8 @@ type AuthRepository interface {
 type LevelRepository interface {
 	AddLevel(level model.Level) (string, error)
 	AddSectionToLevel(levelId string, sectionId string) error
+	GetAllLevels() ([]map[string]model.Level, error)
+	GetLevelById(levelId string) (*model.Level, error)
 }
 
 type SectionRepository interface {
@@ -27,4 +30,9 @@ type QuestionRepository interface {
 
 type LessonRepository interface {
 	AddLesson(lesson model.Lesson) (string, error)
+}
+
+type UserCourseRepository interface {
+	AddUserCourse(userId string, levelsForUser *dto.LevelsForUser) error
+	GetUserCourse(userId string) (*model.UserCourse, error)
 }

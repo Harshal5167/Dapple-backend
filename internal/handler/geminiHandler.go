@@ -31,7 +31,7 @@ func (h *GeminiHandler) EvaluateAnswer(c *fiber.Ctx) error {
 		})
 	}
 
-	resp, err := h.geminiService.EvaluateAnswer(c.Context(), req)
+	resp, err := h.geminiService.EvaluateAnswer(req)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),

@@ -10,11 +10,15 @@ import (
 )
 
 type AuthService struct {
-	authRepository interfaces.AuthRepository
+	authRepository    interfaces.AuthRepository
+	userCourseService interfaces.UserCourseService
 }
 
-func NewAuthService(authRepository interfaces.AuthRepository) *AuthService {
-	return &AuthService{authRepository}
+func NewAuthService(authRepository interfaces.AuthRepository, userCourseService interfaces.UserCourseService) *AuthService {
+	return &AuthService{
+		authRepository:    authRepository,
+		userCourseService: userCourseService,
+	}
 }
 
 func (c *AuthService) Login(reqBody *dto.LoginRequest) (*dto.AuthResponse, error) {
@@ -43,9 +47,7 @@ func (c *AuthService) Login(reqBody *dto.LoginRequest) (*dto.AuthResponse, error
 	}
 	return &dto.AuthResponse{
 			Token:     token,
-			FirstName: user.FirstName,
-			Level:     user.Level,
-			Section:   user.Section},
+			FirstName: user.FirstName},
 		nil
 }
 
@@ -61,14 +63,23 @@ func (c *AuthService) Register(reqBody *dto.RegisterRequest) (*dto.AuthResponse,
 		return nil, errors.New("email in token does not match email in request body")
 	}
 
-	userId, err := c.authRepository.CreateNewUser(model.User{
-		Email:     reqBody.Email,
-		FirstName: reqBody.FirstName,
-		LastName:  reqBody.LastName,
-		Level:     0,
-		Section:   0,
-	})
+	newUser := model.User{
+		Email:                   reqBody.Email,
+		FirstName:               reqBody.FirstName,
+		LastName:                reqBody.LastName,
+		Age:                     reqBody.Age,
+		Profession:              reqBody.Profession,
+		SocialChallenges:        reqBody.SocialChallenges,
+		StrugglingSocialSetting: reqBody.StrugglingSocialSetting,
+		Gender:                  reqBody.Gender,
+		XP:                      0,
+	}
+	userId, err := c.authRepository.CreateNewUser(newUser)
 	if err != nil {
+		return nil, err
+	}
+
+	if err = c.userCourseService.TailorUserCourse(userId, newUser); err != nil {
 		return nil, err
 	}
 
@@ -82,7 +93,6 @@ func (c *AuthService) Register(reqBody *dto.RegisterRequest) (*dto.AuthResponse,
 	return &dto.AuthResponse{
 			Token:     token,
 			FirstName: reqBody.FirstName,
-			Level:     0,
-			Section:   0},
+		},
 		nil
 }

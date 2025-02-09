@@ -2,14 +2,14 @@
 package interfaces
 
 import (
-	"context"
-
 	"github.com/Harshal5167/Dapple-backend/internal/dto"
+	"github.com/Harshal5167/Dapple-backend/internal/model"
 	"github.com/gofiber/fiber/v2"
 )
 
 type GeminiService interface {
-	EvaluateAnswer(ctx context.Context, req *dto.EvaluationRequest) (*dto.EvaluationResponse, error)
+	EvaluateAnswer(req *dto.EvaluationRequest) (*dto.EvaluationResponse, error)
+	GenerateUserCourse(user model.User, levelDetails []map[string]string) (*dto.LevelsForUser, error)
 }
 
 type GeminiHandler interface {

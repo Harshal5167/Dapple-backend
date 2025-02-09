@@ -69,3 +69,37 @@ func (c *LevelRepository) AddSectionToLevel(levelId string, sectionId string) er
 	}
 	return nil
 }
+
+func (c *LevelRepository) GetAllLevels() ([]map[string]model.Level, error) {
+	ctx := context.Background()
+
+	client, err := c.firebaseApp.Database(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var levels []map[string]model.Level
+	err = client.NewRef("levels").Get(ctx, &levels)
+	if err != nil {
+		return nil, err
+	}
+
+	return levels, nil
+}
+
+func (c *LevelRepository) GetLevelById(levelId string) (*model.Level, error) {
+	ctx := context.Background()
+
+	client, err := c.firebaseApp.Database(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var level *model.Level
+	err = client.NewRef("levels").Child(levelId).Get(ctx, &level)
+	if err != nil {
+		return nil, err
+	}
+
+	return level, nil
+}

@@ -3,10 +3,15 @@ package dto
 import "github.com/Harshal5167/Dapple-backend/internal/model"
 
 type RegisterRequest struct {
-	Email         string `json:"email"`
-	FirstName     string `json:"firstName"`
-	LastName      string `json:"lastName"`
-	FirebaseToken string `json:"firebaseToken"`
+	Email                   string   `json:"email"`
+	FirstName               string   `json:"firstName"`
+	LastName                string   `json:"lastName"`
+	FirebaseToken           string   `json:"firebaseToken"`
+	Age                     int      `json:"age"`
+	Gender                  string   `json:"gender"`
+	Profession              string   `json:"profession"`
+	SocialChallenges        []string `json:"socialChallenges"`
+	StrugglingSocialSetting []string `json:"strugglingSocialSetting"`
 }
 
 type LoginRequest struct {

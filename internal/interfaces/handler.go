@@ -24,3 +24,7 @@ type QuestionHandler interface {
 type LessonHandler interface {
 	AddLesson(c *fiber.Ctx) error
 }
+
+type UserCourseHandler interface {
+	GetUserCourse(c *fiber.Ctx) error
+}

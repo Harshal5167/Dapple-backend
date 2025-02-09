@@ -2,6 +2,7 @@ package interfaces
 
 import (
 	"github.com/Harshal5167/Dapple-backend/internal/dto"
+	"github.com/Harshal5167/Dapple-backend/internal/model"
 )
 
 type AuthService interface {
@@ -23,4 +24,9 @@ type QuestionService interface {
 
 type LessonService interface {
 	AddLesson(req *dto.AddLessonRequest) (*dto.AddLessonResponse, error)
+}
+
+type UserCourseService interface {
+	TailorUserCourse(userId string, user model.User) error
+	GetUserCourse(userId string) (*dto.UserCourseResponse, error)
 }

@@ -39,11 +39,13 @@ func (a *App) setupRepositories() {
 	a.Repositories.SectionRepo = repository.NewSectionRepository(a.config.FirebaseApp)
 	a.Repositories.QuestionRepo = repository.NewQuestionRepository(a.config.FirebaseApp)
 	a.Repositories.LessonRepo = repository.NewLessonRepository(a.config.FirebaseApp)
+	a.Repositories.UserCourseRepo = repository.NewUserCourseRepository(a.config.FirebaseApp)
 }
 
 func (a *App) setupServices() {
-	a.Services.AuthService = service.NewAuthService(a.Repositories.AuthRepo)
 	a.Services.GeminiService = service.NewGeminiService(a.config.GeminiModel)
+	a.Services.UserCourseService = service.NewUserCourseService(a.Repositories.UserCourseRepo, a.Repositories.LevelRepo, a.Services.GeminiService)
+	a.Services.AuthService = service.NewAuthService(a.Repositories.AuthRepo, a.Services.UserCourseService)
 	a.Services.LevelService = service.NewLevelService(a.Repositories.LevelRepo)
 	a.Services.SectionService = service.NewSectionService(a.Repositories.SectionRepo, a.Repositories.LevelRepo)
 	a.Services.QuestionService = service.NewQuestionService(a.Repositories.QuestionRepo, a.Repositories.SectionRepo)
@@ -57,6 +59,7 @@ func (a *App) setupHandlers() {
 	a.Handler.SectionHandler = handler.NewSectionHandler(a.Services.SectionService)
 	a.Handler.QuestionHandler = handler.NewQuestionHandler(a.Services.QuestionService)
 	a.Handler.LessonHandler = handler.NewLessonHandler(a.Services.LessonService)
+	a.Handler.UserCourseHandler = handler.NewUserCourseHandler(a.Services.UserCourseService)
 }
 
 func (a *App) setupRoutes() {
@@ -66,4 +69,5 @@ func (a *App) setupRoutes() {
 	routes.NewSectionRoutes(a.Handler.SectionHandler).SectionRoutes(a.Fiber)
 	routes.NewQuestionRoute(a.Handler.QuestionHandler).QuestionRoutes(a.Fiber)
 	routes.NewLessonRoutes(a.Handler.LessonHandler).LessonRoutes(a.Fiber)
+	routes.NewUserCourseRoutes(a.Handler.UserCourseHandler).UserCourseRoutes(a.Fiber)
 }
