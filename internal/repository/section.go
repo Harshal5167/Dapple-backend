@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
 
 	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/db"
@@ -33,6 +32,22 @@ func (c *SectionRepository) AddSection(section model.Section) (string, error) {
 	return ref.Key, nil
 }
 
+func (c *SectionRepository) GetNoOfItems(sectionId string, itemType string) (int, error) {
+	ctx := context.Background()
+
+	client, err := c.firebaseApp.Database(ctx)
+	if err != nil {
+		return 0, err
+	}
+	ref := client.NewRef("sections").Child(sectionId).Child(itemType)
+	var items []string
+	err = ref.Get(ctx, &items)
+	if err != nil {
+		return 0, err
+	}
+	return len(items), nil
+}
+
 func (c *SectionRepository) AddQuestionToSection(sectionId string, questionId string) error {
 	ctx := context.Background()
 
@@ -46,10 +61,6 @@ func (c *SectionRepository) AddQuestionToSection(sectionId string, questionId st
 	err = ref.Get(ctx, &questions)
 	if err != nil {
 		return err
-	}
-
-	if len(questions) == 4 {
-		return fmt.Errorf("section already has 4 questions")
 	}
 
 	questions = append(questions, questionId)
@@ -75,14 +86,32 @@ func (c *SectionRepository) AddLessonToSection(sectionId string, lessonId string
 		return err
 	}
 
-	if len(lessons) == 4 {
-		return fmt.Errorf("section already has 4 lessons")
-	}
-
 	lessons = append(lessons, lessonId)
 	err = ref.Set(ctx, lessons)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func (c *SectionRepository) GetQuestionsAndLessons(sectionId string) ([]string, []string, error) {
+	ctx := context.Background()
+
+	client, err := c.firebaseApp.Database(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var questions []string
+	ref := client.NewRef("sections").Child(sectionId)
+	if err = ref.Child("questions").Get(ctx, &questions); err != nil {
+		return nil, nil, err
+	}
+
+	var lessons []string
+	if err = ref.Child("lessons").Get(ctx, &lessons); err != nil {
+		return nil, nil, err
+	}
+
+	return questions, lessons, nil
 }

@@ -43,7 +43,7 @@ func (h *QuestionHandler) AddQuestion(c *fiber.Ctx) error {
 		})
 	}
 
-	if req.Type == model.Subjective && (len(req.BestAnswer) == 0) {
+	if (req.Type == model.Subjective || req.Type == model.Test || req.Type == model.Voice) && (len(req.BestAnswer) == 0) {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Invalid subjective question",
 		})

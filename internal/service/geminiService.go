@@ -91,7 +91,7 @@ func (s *geminiService) GenerateUserCourse(user model.User, levelDetails []map[s
 	promptTemplate := `You are a neurodiverse expert which focuses on overcoming social interactions anxiety and teach patients social cues.
 	You have to design a course for user which will help them to overcome their social anxiety and improve their social skills.
 	We are providing you with some available content which has been designed by our team. You have to select the most suitable content for the user based on their profile.
-	Please analyze the following user profile and available levels to select the 10 most suitable levels for this user.
+	Please analyze the following user profile and available levels to select the 3 most suitable levels for this user.
 
 	User Profile:
 	- FirstName: %s
@@ -102,11 +102,11 @@ func (s *geminiService) GenerateUserCourse(user model.User, levelDetails []map[s
 	- SocialChallenges: %s
 	- StrugglingSocialSetting: %s
 
-	Analyze this user info and indentify the problems it has then provide him the solution by suggesting 10 levels from the available levels which will be best for him to overcome his fears and problems.
+	Analyze this user info and indentify the problems it has then provide him the solution by suggesting 3 levels from the available levels which will be best for him to overcome his fears and problems.
 	
 	Available Levels: %s
 	
-	Please select exactly 10 levels that would be most appropriate for this user based on their profile. Consider the following factors:
+	Please select exactly 3 levels that would be most appropriate for this user based on their profile. Consider the following factors:
 	1. User's age 
 	2. Alignment with his profession and gender.
 	3. Help him overcome his social challenges.
@@ -118,7 +118,7 @@ func (s *geminiService) GenerateUserCourse(user model.User, levelDetails []map[s
 			"levelId"
 		]
 	}
-	Note that you have to select exactly 10 levels so the selectedLevels should contains 10 levelIds.
+	Note that you have to select exactly 3 levels so the selectedLevels should contains 3 levelIds.
 	`
 
 	levelDetailsString := utils.BuildStringForLevels(levelDetails)
@@ -152,13 +152,15 @@ func (s *geminiService) GenerateUserCourse(user model.User, levelDetails []map[s
 		responseText.WriteString(fmt.Sprintf("%v", part))
 	}
 
+	fmt.Println(responseText.String())
+
 	var response dto.LevelsForUser
 	err = json.Unmarshal([]byte(responseText.String()), &response)
 	if err != nil {
 		return nil, fmt.Errorf("parsing error: %v", err)
 	}
 
-	if len(response.SelectedLevelIds) != 10 {
+	if len(response.SelectedLevelIds) != 3 {
 		return nil, fmt.Errorf("error generating levels for user")
 	}
 

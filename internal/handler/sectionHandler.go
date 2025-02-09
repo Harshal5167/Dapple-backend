@@ -39,3 +39,20 @@ func (h *SectionHandler) AddSection(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(resp)
 }
 
+func (h *SectionHandler) GetSection(c *fiber.Ctx) error {
+	sectionId := c.Params("sectionId")
+	if sectionId == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Missing sectionId",
+		})
+	}
+
+	resp, err := h.sectionService.GetSectionData(sectionId)	
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+	return c.Status(fiber.StatusOK).JSON(resp)
+}
+

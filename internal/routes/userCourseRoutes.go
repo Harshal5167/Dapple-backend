@@ -18,6 +18,6 @@ func NewUserCourseRoutes(handler interfaces.UserCourseHandler) *UserCourseRoutes
 
 func (r *UserCourseRoutes) UserCourseRoutes(app *fiber.App) {
 	api := app.Group("/api")
-	userCourse := api.Group("/userCourse", middleware.IsAuth)
+	userCourse := api.Group("/user-course", middleware.IsAuth)
 	userCourse.Get("/", r.handler.GetUserCourse)
 }

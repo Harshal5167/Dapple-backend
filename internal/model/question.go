@@ -5,6 +5,8 @@ type QuestionType string
 const (
 	Subjective QuestionType = "subjective"
 	Objective  QuestionType = "objective"
+	Voice      QuestionType = "voice"
+	Test       QuestionType = "test"
 )
 
 type Question struct {

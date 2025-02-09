@@ -1,6 +1,8 @@
 package service
 
 import (
+	"fmt"
+
 	"github.com/Harshal5167/Dapple-backend/data"
 	"github.com/Harshal5167/Dapple-backend/internal/dto"
 	"github.com/Harshal5167/Dapple-backend/internal/interfaces"
@@ -28,20 +30,21 @@ func (s *UserCourseService) TailorUserCourse(userId string, user model.User) err
 	}
 
 	var levelDetails []map[string]string
-	for _, level := range levels {
-		for key, value := range level {
-			levelDetails = append(levelDetails, map[string]string{
-				"levelId":     key,
-				"levelName":   value.Name,
-				"desctiption": value.Description,
-			})
-		}
+	fmt.Println(levels)
+	for key, level := range levels {
+		levelDetails = append(levelDetails, map[string]string{
+			"levelId":     key,
+			"levelName":   level.Name,
+			"description": level.Description,
+		})
 	}
 
+	fmt.Println(levelDetails)
 	levelsForUser, err := s.geminiService.GenerateUserCourse(user, levelDetails)
 	if err != nil {
 		return err
 	}
+	fmt.Println(levelsForUser)
 
 	if err := s.userCourseRepo.AddUserCourse(userId, levelsForUser); err != nil {
 		return err
@@ -63,9 +66,9 @@ func (s *UserCourseService) GetUserCourse(userId string) (*dto.UserCourseRespons
 		}
 		levels = append(levels, *level)
 	}
-	
+
 	return &dto.UserCourseResponse{
-		Levels: levels,
+		Levels:      levels,
 		SectionData: data.SectionData,
 		UserProgess: userCourse.UserProgress,
 	}, nil

@@ -47,7 +47,7 @@ func (a *App) setupServices() {
 	a.Services.UserCourseService = service.NewUserCourseService(a.Repositories.UserCourseRepo, a.Repositories.LevelRepo, a.Services.GeminiService)
 	a.Services.AuthService = service.NewAuthService(a.Repositories.AuthRepo, a.Services.UserCourseService)
 	a.Services.LevelService = service.NewLevelService(a.Repositories.LevelRepo)
-	a.Services.SectionService = service.NewSectionService(a.Repositories.SectionRepo, a.Repositories.LevelRepo)
+	a.Services.SectionService = service.NewSectionService(a.Repositories.SectionRepo, a.Repositories.LevelRepo, a.Repositories.QuestionRepo, a.Repositories.LessonRepo)
 	a.Services.QuestionService = service.NewQuestionService(a.Repositories.QuestionRepo, a.Repositories.SectionRepo)
 	a.Services.LessonService = service.NewLessonService(a.Repositories.LessonRepo, a.Repositories.SectionRepo)
 }
@@ -56,7 +56,7 @@ func (a *App) setupHandlers() {
 	a.Handler.AuthHandler = handler.NewAuthHandler(a.Services.AuthService)
 	a.Handler.GeminiHandler = handler.NewGeminiHandler(a.Services.GeminiService)
 	a.Handler.LevelHandler = handler.NewLevelHandler(a.Services.LevelService)
-	a.Handler.SectionHandler = handler.NewSectionHandler(a.Services.SectionService)
+	a.Handler.SectionHandler = handler.NewSectionHandler(a.Services.SectionService, )
 	a.Handler.QuestionHandler = handler.NewQuestionHandler(a.Services.QuestionService)
 	a.Handler.LessonHandler = handler.NewLessonHandler(a.Services.LessonService)
 	a.Handler.UserCourseHandler = handler.NewUserCourseHandler(a.Services.UserCourseService)

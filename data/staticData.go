@@ -1,20 +1,25 @@
 package data
 
-var SectionData = []map[string]interface{}{
+type StaticSectionData struct {
+	Title string
+	Xp    int
+}
+
+var SectionData = []StaticSectionData{
 	{
-		"sectionTitle": "What to Speak?",
-		"sectionXp":    480,
+		Title: "What to Speak?",
+		Xp:    480,
 	},
 	{
-		"sectionTitle": "What to Speak?",
-		"sectionXp":    480,
+		Title: "What to Speak?",
+		Xp:    480,
 	},
 	{
-		"sectionTitle": "What to Speak?",
-		"sectionXp":    480,
+		Title: "What to Speak?",
+		Xp:    480,
 	},
 	{
-		"sectionTitle": "What to Speak?",
-		"sectionXp":    480,
+		Title: "What to Speak?",
+		Xp:    480,
 	},
 }

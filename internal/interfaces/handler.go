@@ -15,6 +15,7 @@ type LevelHandler interface {
 
 type SectionHandler interface {
 	AddSection(c *fiber.Ctx) error
+	GetSection(c *fiber.Ctx) error
 }
 
 type QuestionHandler interface {

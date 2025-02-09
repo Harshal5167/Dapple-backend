@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-
 	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/db"
 	"github.com/Harshal5167/Dapple-backend/internal/model"
@@ -70,7 +69,7 @@ func (c *LevelRepository) AddSectionToLevel(levelId string, sectionId string) er
 	return nil
 }
 
-func (c *LevelRepository) GetAllLevels() ([]map[string]model.Level, error) {
+func (c *LevelRepository) GetAllLevels() (map[string]model.Level, error) {
 	ctx := context.Background()
 
 	client, err := c.firebaseApp.Database(ctx)
@@ -78,7 +77,7 @@ func (c *LevelRepository) GetAllLevels() ([]map[string]model.Level, error) {
 		return nil, err
 	}
 
-	var levels []map[string]model.Level
+	var levels map[string]model.Level
 	err = client.NewRef("levels").Get(ctx, &levels)
 	if err != nil {
 		return nil, err

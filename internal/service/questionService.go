@@ -1,6 +1,8 @@
 package service
 
 import (
+	"fmt"
+
 	"github.com/Harshal5167/Dapple-backend/internal/dto"
 	"github.com/Harshal5167/Dapple-backend/internal/interfaces"
 	"github.com/Harshal5167/Dapple-backend/internal/model"
@@ -19,6 +21,14 @@ func NewQuestionService(questionRepo interfaces.QuestionRepository, sectionRepo 
 }
 
 func (s *QuestionService) AddQuestion(req *dto.AddQuestionRequest) (*dto.AddQuestionResponse, error) {
+	noOfQuestions, err := s.sectionRepo.GetNoOfItems(req.SectionId, "questions")
+	if err != nil {
+		return nil, err
+	}
+	if noOfQuestions >= 4 {
+		return nil, fmt.Errorf("cannot add more than 4 questions to a section")
+	}
+
 	questionId, err := s.questionRepo.AddQuestion(model.Question{
 		QuestionText:  req.QuestionText,
 		XP:            req.XP,

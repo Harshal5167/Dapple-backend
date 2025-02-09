@@ -1,12 +1,14 @@
 package dto
 
-import "github.com/Harshal5167/Dapple-backend/internal/model"
+import (
+	"github.com/Harshal5167/Dapple-backend/data"
+	"github.com/Harshal5167/Dapple-backend/internal/model"
+)
 
 type AuthResponse struct {
 	Token     string `json:"token"`
 	FirstName string `json:"firstName"`
-	Level     int    `json:"level"`
-	Section   int    `json:"section"`
+	XP        int    `json:"xp"`
 }
 
 type EvaluationResponse struct {
@@ -36,6 +38,10 @@ type LevelsForUser struct {
 
 type UserCourseResponse struct {
 	Levels      []model.Level            `json:"levels"`
-	SectionData []map[string]interface{} `json:"sectionData"`
+	SectionData []data.StaticSectionData `json:"sectionData"`
 	UserProgess model.UserProgress       `json:"userProgress"`
+}
+
+type SectionData struct {
+	Data []map[string]interface{} `json:"data"`
 }

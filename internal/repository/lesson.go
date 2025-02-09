@@ -32,3 +32,20 @@ func (r *LessonRepository) AddLesson(lesson model.Lesson) (string, error) {
 
 	return ref.Key, nil
 }
+
+func (r *LessonRepository) GetLessonById(lessonId string) (*map[string]interface{}, error) {
+	ctx := context.Background()
+
+	client, err := r.firebaseApp.Database(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var lesson map[string]interface{}
+	if err := client.NewRef("lessons/"+lessonId).Get(ctx, &lesson); err != nil {
+		return nil, err
+	}
+	lesson["lessonId"] = lessonId
+
+	return &lesson, nil
+}
