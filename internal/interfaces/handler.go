@@ -11,6 +11,7 @@ type AuthHandler interface {
 
 type LevelHandler interface {
 	AddLevel(c *fiber.Ctx) error
+	AddCompleteLevel(c *fiber.Ctx) error
 }
 
 type SectionHandler interface {

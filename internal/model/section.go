@@ -8,3 +8,10 @@ type Section struct {
 	Questions     []string `json:"questions"`
 	NextSectionId string   `json:"nextSectionId"`
 }
+
+type SectionData struct {
+	Name      string     `json:"name"`
+	TotalXP   int        `json:"totalXP"`
+	Questions []Question `json:"questions"`
+	Lessons   []Lesson   `json:"lessons,omitempty"`
+}

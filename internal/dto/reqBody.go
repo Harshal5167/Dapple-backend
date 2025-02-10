@@ -56,3 +56,8 @@ type AddLessonRequest struct {
 	XP        int      `json:"xp"`
 	ImageUrl  string   `json:"imageUrl,omitempty"`
 }
+
+type AddCompleteLevelRequest struct {
+	Level    model.Level         `json:"level"`
+	Sections []model.SectionData `json:"sections"`
+}

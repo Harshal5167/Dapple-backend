@@ -17,4 +17,6 @@ func (r *LevelRoute) LevelRoutes(app *fiber.App) {
 	api := app.Group("/api")
 	level:= api.Group("/level")
 	level.Post("/", r.handler.AddLevel)
+	level.Post("/add-complete", r.handler.AddCompleteLevel)
 }
+

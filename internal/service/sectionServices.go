@@ -7,23 +7,28 @@ import (
 )
 
 type SectionService struct {
-	sectionRepo  interfaces.SectionRepository
-	levelRepo    interfaces.LevelRepository
-	questionRepo interfaces.QuestionRepository
-	lessonRepo   interfaces.LessonRepository
+	sectionRepo     interfaces.SectionRepository
+	levelRepo       interfaces.LevelRepository
+	questionRepo    interfaces.QuestionRepository
+	lessonRepo      interfaces.LessonRepository
+	questionService interfaces.QuestionService
+	lessonService   interfaces.LessonService
 }
 
-// GetSection implements interfaces.SectionService.
-func (s *SectionService) GetSection(sectionId string) (*dto.SectionData, error) {
-	panic("unimplemented")
-}
-
-func NewSectionService(sectionRepo interfaces.SectionRepository, levelRepo interfaces.LevelRepository, questionRepo interfaces.QuestionRepository, lessonRepo interfaces.LessonRepository) *SectionService {
+func NewSectionService(
+	sectionRepo interfaces.SectionRepository,
+	levelRepo interfaces.LevelRepository,
+	questionRepo interfaces.QuestionRepository,
+	lessonRepo interfaces.LessonRepository,
+	questionService interfaces.QuestionService,
+	lessonService interfaces.LessonService) *SectionService {
 	return &SectionService{
-		sectionRepo:  sectionRepo,
-		levelRepo:    levelRepo,
-		questionRepo: questionRepo,
-		lessonRepo:   lessonRepo,
+		sectionRepo:     sectionRepo,
+		levelRepo:       levelRepo,
+		questionRepo:    questionRepo,
+		lessonRepo:      lessonRepo,
+		questionService: questionService,
+		lessonService:   lessonService,
 	}
 }
 
@@ -88,4 +93,47 @@ func (s *SectionService) GetSectionData(sectionId string) (*dto.SectionData, err
 	return &dto.SectionData{
 		Data: data,
 	}, nil
+}
+
+func (s *SectionService) AddCompleteSection(req *model.SectionData, levelId string) error {
+	addSectionResponse, err := s.AddSection(&dto.AddSectionRequest{
+		Name:    req.Name,
+		LevelId: levelId,
+		TotalXP: req.TotalXP,
+	})
+	if err != nil {
+		return err
+	}
+
+	for _, question := range req.Questions {
+		_, err := s.questionService.AddQuestion(&dto.AddQuestionRequest{
+			QuestionText:  question.QuestionText,
+			Options:       question.Options,
+			CorrectOption: question.CorrectOption,
+			SectionId:     addSectionResponse.SectionId,
+			ImageUrl:      question.ImageUrl,
+			Type:          question.Type,
+			BestAnswer:    question.BestAnswer,
+			Explanation:   question.Explanation,
+			XP:            question.XP,
+		})
+		if err != nil {
+			return err
+		}
+	}
+
+	for _, lesson := range req.Lessons {
+		_, err := s.lessonService.AddLesson(&dto.AddLessonRequest{
+			Title:     lesson.Title,
+			Content:   lesson.Content,
+			SectionId: addSectionResponse.SectionId,
+			XP:        lesson.XP,
+			ImageUrl:  lesson.ImageUrl,
+		})
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

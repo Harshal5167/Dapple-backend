@@ -31,3 +31,6 @@ Thumbs.db
 # Ignore build artifacts
 bin/
 dist/
+
+# Ignore json files
+*.json

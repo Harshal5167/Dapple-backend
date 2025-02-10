@@ -12,11 +12,13 @@ type AuthService interface {
 
 type LevelService interface {
 	AddLevel(req *dto.AddLevelRequest) (*dto.AddLevelResponse, error)
+	AddCompleteLevel(req *dto.AddCompleteLevelRequest) (*dto.AddLevelResponse, error)
 }
 
 type SectionService interface {
 	AddSection(req *dto.AddSectionRequest) (*dto.AddSectionResponse, error)
 	GetSectionData(sectionId string) (*dto.SectionData, error)
+	AddCompleteSection(section *model.SectionData, levelId string) error
 }
 
 type QuestionService interface {

@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+
 	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/db"
 	"github.com/Harshal5167/Dapple-backend/internal/model"
@@ -55,7 +56,7 @@ func (c *LevelRepository) AddSectionToLevel(levelId string, sectionId string) er
 	}
 
 	if lastSectionId != "" {
-		err = client.NewRef("sections").Child(lastSectionId).Child("nextSection").Set(ctx, sectionId)
+		err = client.NewRef("sections").Child(lastSectionId).Child("nextSectionId").Set(ctx, sectionId)
 		if err != nil {
 			return err
 		}

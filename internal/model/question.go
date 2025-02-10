@@ -16,7 +16,7 @@ type Question struct {
 	Options       []string     `json:"options,omitempty"`
 	CorrectOption int          `json:"correctOption,omitzero"`
 	BestAnswer    []string     `json:"bestAnswer,omitempty"`
-	SectionId     string       `json:"sectionId"`
+	SectionId     string       `json:"sectionId,omitempty"`
 	Explanation   []string     `json:"explanation,omitempty"`
 	XP            int          `json:"xp"`
 }

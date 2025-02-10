@@ -7,12 +7,14 @@ import (
 )
 
 type LevelService struct {
-	levelRepo interfaces.LevelRepository
+	levelRepo      interfaces.LevelRepository
+	sectionService interfaces.SectionService
 }
 
-func NewLevelService(levelRepo interfaces.LevelRepository) *LevelService {
+func NewLevelService(levelRepo interfaces.LevelRepository, sectionService interfaces.SectionService) *LevelService {
 	return &LevelService{
-		levelRepo: levelRepo,
+		levelRepo:      levelRepo,
+		sectionService: sectionService,
 	}
 }
 
@@ -26,6 +28,32 @@ func (s *LevelService) AddLevel(req *dto.AddLevelRequest) (*dto.AddLevelResponse
 		return nil, err
 	}
 
+	return &dto.AddLevelResponse{
+		LevelId: levelId,
+	}, nil
+}
+
+func (s *LevelService) AddCompleteLevel(req *dto.AddCompleteLevelRequest) (*dto.AddLevelResponse, error) {
+	levelId, err := s.levelRepo.AddLevel(model.Level{
+		Name:        req.Level.Name,
+		Description: req.Level.Description,
+		ImageUrl:    req.Level.ImageUrl,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	for _, section := range req.Sections {
+		err := s.sectionService.AddCompleteSection(&model.SectionData{
+			Name:      section.Name,
+			TotalXP:   section.TotalXP,
+			Questions: section.Questions,
+			Lessons:   section.Lessons,
+		}, levelId)
+		if err != nil {
+			return nil, err
+		}
+	}
 	return &dto.AddLevelResponse{
 		LevelId: levelId,
 	}, nil
