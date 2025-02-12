@@ -13,13 +13,19 @@ type UserCourseService struct {
 	userCourseRepo interfaces.UserCourseRepository
 	levelRepo      interfaces.LevelRepository
 	geminiService  interfaces.GeminiService
+	sectionRepo    interfaces.SectionRepository
 }
 
-func NewUserCourseService(repo interfaces.UserCourseRepository, levelRepo interfaces.LevelRepository, geminiService interfaces.GeminiService) interfaces.UserCourseService {
+func NewUserCourseService(
+	userCourseRepo interfaces.UserCourseRepository,
+	levelRepo interfaces.LevelRepository,
+	geminiService interfaces.GeminiService,
+	sectionRepo interfaces.SectionRepository) interfaces.UserCourseService {
 	return &UserCourseService{
-		userCourseRepo: repo,
+		userCourseRepo: userCourseRepo,
 		levelRepo:      levelRepo,
 		geminiService:  geminiService,
+		sectionRepo:    sectionRepo,
 	}
 }
 
@@ -72,4 +78,21 @@ func (s *UserCourseService) GetUserCourse(userId string) (*dto.UserCourseRespons
 		SectionData: data.SectionData,
 		UserProgess: userCourse.UserProgress,
 	}, nil
+}
+
+func (s *UserCourseService) UpdateUserProgress(userId string, sectionId string) error {
+	nextSectionId, err := s.sectionRepo.GetNextSectionId(sectionId)
+	if err != nil {
+		return err
+	}
+	if nextSectionId == "" {
+		if err := s.userCourseRepo.UpdateUserProgress(userId, true); err != nil {
+			return err
+		}
+	} else {
+		if err := s.userCourseRepo.UpdateUserProgress(userId, false); err != nil {
+			return err
+		}
+	}
+	return nil
 }

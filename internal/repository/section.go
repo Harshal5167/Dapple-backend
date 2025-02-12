@@ -63,14 +63,14 @@ func (c *SectionRepository) AddQuestionToSection(sectionId string, questionId st
 	}
 
 	ref := client.NewRef("sections").Child(sectionId).Child("questions")
-	var questions []string
-	err = ref.Get(ctx, &questions)
-	if err != nil {
-		return err
-	}
-
-	questions = append(questions, questionId)
-	err = ref.Set(ctx, questions)
+	err = ref.Transaction(ctx, func(node db.TransactionNode) (interface{}, error) {
+		var questions []string
+		if err := node.Unmarshal(&questions); err != nil {
+			return nil, err
+		}
+		questions = append(questions, questionId)
+		return questions, nil
+	})
 	if err != nil {
 		return err
 	}
@@ -86,14 +86,15 @@ func (c *SectionRepository) AddLessonToSection(sectionId string, lessonId string
 	}
 
 	ref := client.NewRef("sections").Child(sectionId).Child("lessons")
-	var lessons []string
-	err = ref.Get(ctx, &lessons)
-	if err != nil {
-		return err
-	}
 
-	lessons = append(lessons, lessonId)
-	err = ref.Set(ctx, lessons)
+	err = ref.Transaction(ctx, func(node db.TransactionNode) (interface{}, error) {
+		var lessons []string
+		if err := node.Unmarshal(&lessons); err != nil {
+			return nil, err
+		}
+		lessons = append(lessons, lessonId)
+		return lessons, nil
+	})
 	if err != nil {
 		return err
 	}
@@ -108,34 +109,25 @@ func (c *SectionRepository) GetQuestionsAndLessons(sectionId string) ([]string, 
 		return nil, nil, err
 	}
 
-	var questions []string
-	ref := client.NewRef("sections").Child(sectionId)
-	if err = ref.Child("questions").Get(ctx, &questions); err != nil {
+	var section model.Section
+	if err = client.NewRef("sections").Child(sectionId).Get(ctx, &section); err != nil {
 		return nil, nil, err
 	}
 
-	var lessons []string
-	if err = ref.Child("lessons").Get(ctx, &lessons); err != nil {
-		return nil, nil, err
-	}
-
-	return questions, lessons, nil
+	return section.Questions, section.Lessons, nil
 }
 
 func (c *SectionRepository) StoreSectionProgress(userId string, sectionId string) (*model.SectionProgress, error) {
 	ctx := context.Background()
 	key := fmt.Sprintf("user:%s:section:%s", userId, sectionId)
 
-	val, err := c.rdb.Exists(ctx, key).Result()
+	var sectionProgress *model.SectionProgress
+	err := c.rdb.HGetAll(ctx, key).Scan(&sectionProgress)
 	if err != nil {
 		return nil, err
 	}
-	if val != 0 {
-		var sectionProgress *model.SectionProgress
-		err = c.rdb.HGetAll(ctx, key).Scan(&sectionProgress)
-		if err != nil {
-			return nil, err
-		}
+
+	if sectionProgress != nil {
 		return sectionProgress, nil
 	}
 
@@ -156,18 +148,35 @@ func (c *SectionRepository) StoreSectionProgress(userId string, sectionId string
 	}, nil
 }
 
-func (c *SectionRepository) UpdateSectionProgress(userId string, sectionId string, xp int) error {
+func (c *SectionRepository) UpdateSectionProgress(userId string, sectionId string, xp int) (int64, error) {
 	ctx := context.Background()
 	key := fmt.Sprintf("user:%s:section:%s", userId, sectionId)
 
-	err := c.rdb.HIncrBy(ctx, key, "progress", 1).Err()
+	progress, err := c.rdb.HIncrBy(ctx, key, "progress", 1).Result()
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	err = c.rdb.HIncrBy(ctx, key, "xp", int64(xp)).Err()
 	if err != nil {
-		return err
+		return 0, err
 	}
-	return nil
+	return progress, nil
+}
+
+func (c *SectionRepository) GetNextSectionId(sectionId string) (string, error) {
+	ctx := context.Background()
+
+	client, err := c.firebaseApp.Database(ctx)
+	if err != nil {
+		return "", err
+	}
+
+	var nextSectionId string
+	err = client.NewRef("sections").Child(sectionId).Child("nextSectionId").Get(ctx, &nextSectionId)
+	if err != nil {
+		return "", err
+	}
+
+	return nextSectionId, nil
 }

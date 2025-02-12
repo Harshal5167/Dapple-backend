@@ -23,7 +23,8 @@ type SectionRepository interface {
 	GetQuestionsAndLessons(sectionId string) ([]string, []string, error)
 	GetNoOfItems(sectionId string, itemType string) (int, error)
 	StoreSectionProgress(userId string, sectionId string) (*model.SectionProgress, error)
-	UpdateSectionProgress(userId string, sectionId string, xp int) error
+	UpdateSectionProgress(userId string, sectionId string, xp int) (int64, error)
+	GetNextSectionId(sectionId string) (string, error)
 }
 
 type QuestionRepository interface {
@@ -39,6 +40,7 @@ type LessonRepository interface {
 type UserCourseRepository interface {
 	AddUserCourse(userId string, levelsForUser *dto.LevelsForUser) error
 	GetUserCourse(userId string) (*model.UserCourse, error)
+	UpdateUserProgress(userId string, levelInc bool) error
 }
 
 type UserRepository interface {

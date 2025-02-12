@@ -11,22 +11,25 @@ import (
 var MaxNoOfQuestions int = 4
 
 type QuestionService struct {
-	questionRepo  interfaces.QuestionRepository
-	sectionRepo   interfaces.SectionRepository
-	geminiService interfaces.GeminiService
-	userRepo      interfaces.UserRepository
+	questionRepo   interfaces.QuestionRepository
+	sectionRepo    interfaces.SectionRepository
+	geminiService  interfaces.GeminiService
+	userRepo       interfaces.UserRepository
+	UserCourseService interfaces.UserCourseService
 }
 
 func NewQuestionService(
 	questionRepo interfaces.QuestionRepository,
 	sectionRepo interfaces.SectionRepository,
 	geminiService interfaces.GeminiService,
-	userRepo interfaces.UserRepository) *QuestionService {
+	userRepo interfaces.UserRepository,
+	UserCourseService interfaces.UserCourseService) *QuestionService {
 	return &QuestionService{
-		questionRepo:  questionRepo,
-		sectionRepo:   sectionRepo,
-		geminiService: geminiService,
-		userRepo:      userRepo,
+		questionRepo:   questionRepo,
+		sectionRepo:    sectionRepo,
+		geminiService:  geminiService,
+		userRepo:       userRepo,
+		UserCourseService: UserCourseService,
 	}
 }
 
@@ -74,9 +77,16 @@ func (s *QuestionService) EvaluateObjectiveAnswer(userId string, req *dto.Evalua
 	if req.SelectedOption == question.CorrectOption {
 		xp = question.XP
 	}
-	err = s.sectionRepo.UpdateSectionProgress(userId, question.SectionId, xp)
+	progress, err := s.sectionRepo.UpdateSectionProgress(userId, question.SectionId, xp)
 	if err != nil {
 		return nil, err
+	}
+
+	if int(progress) >= MaxNoOfLessons+MaxNoOfQuestions {
+		err = s.UserCourseService.UpdateUserProgress(userId, question.SectionId)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return &dto.EvaluateObjectiveAnswerResponse{
@@ -102,9 +112,16 @@ func (s *QuestionService) EvaluateSubjectiveAnswer(userId string, req *dto.Evalu
 		return nil, err
 	}
 
-	err = s.sectionRepo.UpdateSectionProgress(userId, question.SectionId, userAnswerEvaluation.XPGained)
+	progress, err := s.sectionRepo.UpdateSectionProgress(userId, question.SectionId, userAnswerEvaluation.XPGained)
 	if err != nil {
 		return nil, err
+	}
+
+	if int(progress) >= MaxNoOfLessons+MaxNoOfQuestions {
+		err = s.UserCourseService.UpdateUserProgress(userId, question.SectionId)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return &dto.EvaluateSubjectiveAnswerResponse{

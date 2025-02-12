@@ -35,6 +35,7 @@ type LessonService interface {
 type UserCourseService interface {
 	TailorUserCourse(userId string, user model.User) error
 	GetUserCourse(userId string) (*dto.UserCourseResponse, error)
+	UpdateUserProgress(userId string, sectionId string) error
 }
 
 type GeminiService interface {
