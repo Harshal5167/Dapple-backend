@@ -8,6 +8,7 @@ import (
 	"github.com/Harshal5167/Dapple-backend/internal/model"
 )
 
+var MaxNoOfLessons int = 4
 type LessonService struct {
 	lessonRepo  interfaces.LessonRepository
 	sectionRepo interfaces.SectionRepository
@@ -26,8 +27,8 @@ func (s *LessonService) AddLesson(req *dto.AddLessonRequest) (*dto.AddLessonResp
 		return nil, err
 	}
 
-	if noOfLessons >= 4 {
-		return nil, fmt.Errorf("cannot add more than 4 lessons to a section")
+	if noOfLessons >= MaxNoOfLessons {
+		return nil, fmt.Errorf("cannot add more lessons to a section")
 	}
 
 	lessonId, err := s.lessonRepo.AddLesson(model.Lesson{

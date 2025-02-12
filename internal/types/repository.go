@@ -9,4 +9,5 @@ type Repositories struct {
 	QuestionRepo   interfaces.QuestionRepository
 	LessonRepo     interfaces.LessonRepository
 	UserCourseRepo interfaces.UserCourseRepository
+	UserRepo       interfaces.UserRepository
 }

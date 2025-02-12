@@ -31,7 +31,7 @@ func (c *QuestionRepository) AddQuestion(question model.Question) (string, error
 	return ref.Key, nil
 }
 
-func (c *QuestionRepository) GetQuestionById(questionId string) (*map[string]interface{}, error) {
+func (c *QuestionRepository) GetQuestionById(questionId string) (*model.Question, error) {
 	ctx := context.Background()
 
 	client, err := c.firebaseApp.Database(ctx)
@@ -39,11 +39,10 @@ func (c *QuestionRepository) GetQuestionById(questionId string) (*map[string]int
 		return nil, err
 	}
 
-	var question map[string]interface{}
+	var question model.Question
 	if err := client.NewRef("questions").Child(questionId).Get(ctx, &question); err != nil {
 		return nil, err
 	}
 
-	question["questionId"] = questionId
 	return &question, nil
 }

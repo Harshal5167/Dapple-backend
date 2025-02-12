@@ -15,3 +15,7 @@ type SectionData struct {
 	Questions []Question `json:"questions"`
 	Lessons   []Lesson   `json:"lessons,omitempty"`
 }
+type SectionProgress struct {
+	Progress int `json:"progress" redis:"progress"`
+	XP       int `json:"xp" redis:"xp"`
+}

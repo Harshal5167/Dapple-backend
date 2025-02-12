@@ -6,8 +6,6 @@ import (
 )
 
 type AuthRepository interface {
-	CreateNewUser(user model.User) (string, error)
-	GetUserDetailsFromEmail(email string) (model.User, error)
 	VerifyFirebaseToken(token string) (bool, string, error)
 }
 
@@ -24,19 +22,27 @@ type SectionRepository interface {
 	AddLessonToSection(sectionId string, lessonId string) error
 	GetQuestionsAndLessons(sectionId string) ([]string, []string, error)
 	GetNoOfItems(sectionId string, itemType string) (int, error)
+	StoreSectionProgress(userId string, sectionId string) (*model.SectionProgress, error)
+	UpdateSectionProgress(userId string, sectionId string, xp int) error
 }
 
 type QuestionRepository interface {
 	AddQuestion(question model.Question) (string, error)
-	GetQuestionById(questionId string) (*map[string]interface{}, error)
+	GetQuestionById(questionId string) (*model.Question, error)
 }
 
 type LessonRepository interface {
 	AddLesson(lesson model.Lesson) (string, error)
-	GetLessonById(lessonId string) (*map[string]interface{}, error)
+	GetLessonById(lessonId string) (*model.Lesson, error)
 }
 
 type UserCourseRepository interface {
 	AddUserCourse(userId string, levelsForUser *dto.LevelsForUser) error
 	GetUserCourse(userId string) (*model.UserCourse, error)
+}
+
+type UserRepository interface {
+	CreateNewUser(user model.User) (string, error)
+	GetUserDetailsFromEmail(email string) (*model.User, error)
+	GetUserById(userId string) (*model.User, error)
 }

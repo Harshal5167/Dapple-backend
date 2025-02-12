@@ -52,7 +52,7 @@ func (s *SectionService) AddSection(req *dto.AddSectionRequest) (*dto.AddSection
 	}, nil
 }
 
-func (s *SectionService) GetSectionData(sectionId string) (*dto.SectionData, error) {
+func (s *SectionService) GetSectionData(userId string, sectionId string) (*dto.SectionData, error) {
 	questions, lessons, err := s.sectionRepo.GetQuestionsAndLessons(sectionId)
 	if err != nil {
 		return nil, err
@@ -64,7 +64,13 @@ func (s *SectionService) GetSectionData(sectionId string) (*dto.SectionData, err
 		if err != nil {
 			return nil, err
 		}
-		questionList = append(questionList, *question)
+		questionList = append(questionList, map[string]interface{}{
+			"questionId":   questionId,
+			"type":         question.Type,
+			"options":      question.Options,
+			"questionText": question.QuestionText,
+			"imageUrl":     question.ImageUrl,
+		})
 	}
 
 	var lessonList []map[string]interface{}
@@ -73,25 +79,37 @@ func (s *SectionService) GetSectionData(sectionId string) (*dto.SectionData, err
 		if err != nil {
 			return nil, err
 		}
-		lessonList = append(lessonList, *lesson)
+		lessonList = append(lessonList, map[string]interface{}{
+			"lessonId": lessonId,
+			"title":    lesson.Title,
+			"content":  lesson.Content,
+			"imageUrl": lesson.ImageUrl,
+			"XP":       lesson.XP,
+		})
 	}
 
 	var data []map[string]interface{}
-	for i := 0; i < min(2, len(lessonList)); i++ {
+	for i := 0; i < min(MaxNoOfLessons/2, len(lessonList)); i++ {
 		data = append(data, lessonList[i])
 	}
-	for i := 0; i < min(2, len(questionList)); i++ {
+	for i := 0; i < min(MaxNoOfQuestions/2, len(questionList)); i++ {
 		data = append(data, questionList[i])
 	}
-	for i := 2; i < len(lessonList); i++ {
+	for i := MaxNoOfLessons / 2; i < len(lessonList); i++ {
 		data = append(data, lessonList[i])
 	}
-	for i := 2; i < len(questionList); i++ {
+	for i := MaxNoOfQuestions / 2; i < len(questionList); i++ {
 		data = append(data, questionList[i])
 	}
 
+	progress, err := s.sectionRepo.StoreSectionProgress(userId, sectionId)
+	if err != nil {
+		return nil, err
+	}
+
 	return &dto.SectionData{
-		Data: data,
+		Data:            data,
+		SectionProgress: (*progress),
 	}, nil
 }
 
@@ -135,5 +153,21 @@ func (s *SectionService) AddCompleteSection(req *model.SectionData, levelId stri
 		}
 	}
 
+	return nil
+}
+
+func (s *SectionService) UpdateSectionProgress(userId string, lessonId string) error {
+	lesson, err := s.lessonRepo.GetLessonById(lessonId)
+	if err != nil {
+		return err
+	}
+
+	sectionId := lesson.SectionId
+	xp := lesson.XP
+
+	err = s.sectionRepo.UpdateSectionProgress(userId, sectionId, xp)
+	if err != nil {
+		return err
+	}
 	return nil
 }

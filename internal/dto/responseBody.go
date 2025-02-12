@@ -43,5 +43,18 @@ type UserCourseResponse struct {
 }
 
 type SectionData struct {
-	Data []map[string]interface{} `json:"data"`
+	Data            []map[string]interface{} `json:"data"`
+	SectionProgress model.SectionProgress    `json:"sectionProgress"`
+}
+
+type EvaluateObjectiveAnswerResponse struct {
+	CorrectOption int      `json:"correctOption"`
+	Explanation   []string `json:"explanation"`
+	XP            int      `json:"xp"`
+}
+
+type EvaluateSubjectiveAnswerResponse struct {
+	Evaluation []model.Evaluation `json:"evaluation"`
+	BestAnswer []string           `json:"bestAnswer"`
+	XP         int                `json:"xp"`
 }

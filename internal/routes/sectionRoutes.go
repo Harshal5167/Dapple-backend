@@ -2,6 +2,8 @@ package routes
 
 import (
 	"github.com/Harshal5167/Dapple-backend/internal/interfaces"
+	"github.com/Harshal5167/Dapple-backend/internal/middleware"
+
 	// "github.com/Harshal5167/Dapple-backend/internal/middleware"
 	"github.com/gofiber/fiber/v2"
 )
@@ -18,5 +20,6 @@ func (r *SectionRoutes) SectionRoutes(app *fiber.App) {
 	api := app.Group("/api")
 	section := api.Group("/section")
 	section.Post("/", r.sectionHandler.AddSection)
-	section.Get("/:sectionId", r.sectionHandler.GetSection)
+	section.Get("/:sectionId", middleware.IsAuth, r.sectionHandler.GetSection)
+	section.Put("/update-section-progress", middleware.IsAuth, r.sectionHandler.UpdateSectionProgress)
 }

@@ -61,3 +61,17 @@ type AddCompleteLevelRequest struct {
 	Level    model.Level         `json:"level"`
 	Sections []model.SectionData `json:"sections"`
 }
+
+type UpdateSectionProgress struct {
+	LessonId string `json:"lessonId"`
+}
+
+type EvaluateSubjectiveAnswerReq struct {
+	QuestionId string   `json:"questionId"`
+	UserAnswer []string `json:"userAnswer"`
+}
+
+type EvaluateObjectiveAnswerReq struct {
+	QuestionId     string `json:"questionId"`
+	SelectedOption int    `json:"selectedOption"`
+}

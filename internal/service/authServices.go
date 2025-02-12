@@ -13,12 +13,14 @@ import (
 type AuthService struct {
 	authRepository    interfaces.AuthRepository
 	userCourseService interfaces.UserCourseService
+	userRepo          interfaces.UserRepository
 }
 
-func NewAuthService(authRepository interfaces.AuthRepository, userCourseService interfaces.UserCourseService) *AuthService {
+func NewAuthService(authRepository interfaces.AuthRepository, userCourseService interfaces.UserCourseService, userRepo interfaces.UserRepository) *AuthService {
 	return &AuthService{
 		authRepository:    authRepository,
 		userCourseService: userCourseService,
+		userRepo:          userRepo,
 	}
 }
 
@@ -34,7 +36,7 @@ func (c *AuthService) Login(reqBody *dto.LoginRequest) (*dto.AuthResponse, error
 		return nil, errors.New("email in token does not match email in request body")
 	}
 
-	user, err := c.authRepository.GetUserDetailsFromEmail(reqBody.Email)
+	user, err := c.userRepo.GetUserDetailsFromEmail(reqBody.Email)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +80,7 @@ func (c *AuthService) Register(reqBody *dto.RegisterRequest) (*dto.AuthResponse,
 		XP:                      0,
 	}
 	fmt.Println(newUser)
-	userId, err := c.authRepository.CreateNewUser(newUser)
+	userId, err := c.userRepo.CreateNewUser(newUser)
 	if err != nil {
 		return nil, err
 	}

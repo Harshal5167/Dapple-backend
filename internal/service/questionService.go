@@ -8,15 +8,25 @@ import (
 	"github.com/Harshal5167/Dapple-backend/internal/model"
 )
 
+var MaxNoOfQuestions int = 4
+
 type QuestionService struct {
-	questionRepo interfaces.QuestionRepository
-	sectionRepo  interfaces.SectionRepository
+	questionRepo  interfaces.QuestionRepository
+	sectionRepo   interfaces.SectionRepository
+	geminiService interfaces.GeminiService
+	userRepo      interfaces.UserRepository
 }
 
-func NewQuestionService(questionRepo interfaces.QuestionRepository, sectionRepo interfaces.SectionRepository) *QuestionService {
+func NewQuestionService(
+	questionRepo interfaces.QuestionRepository,
+	sectionRepo interfaces.SectionRepository,
+	geminiService interfaces.GeminiService,
+	userRepo interfaces.UserRepository) *QuestionService {
 	return &QuestionService{
-		questionRepo: questionRepo,
-		sectionRepo:  sectionRepo,
+		questionRepo:  questionRepo,
+		sectionRepo:   sectionRepo,
+		geminiService: geminiService,
+		userRepo:      userRepo,
 	}
 }
 
@@ -25,8 +35,8 @@ func (s *QuestionService) AddQuestion(req *dto.AddQuestionRequest) (*dto.AddQues
 	if err != nil {
 		return nil, err
 	}
-	if noOfQuestions >= 4 {
-		return nil, fmt.Errorf("cannot add more than 4 questions to a section")
+	if noOfQuestions >= MaxNoOfQuestions {
+		return nil, fmt.Errorf("cannot add more questions to a section")
 	}
 
 	questionId, err := s.questionRepo.AddQuestion(model.Question{
@@ -51,5 +61,55 @@ func (s *QuestionService) AddQuestion(req *dto.AddQuestionRequest) (*dto.AddQues
 
 	return &dto.AddQuestionResponse{
 		QuestionId: questionId,
+	}, nil
+}
+
+func (s *QuestionService) EvaluateObjectiveAnswer(userId string, req *dto.EvaluateObjectiveAnswerReq) (*dto.EvaluateObjectiveAnswerResponse, error) {
+	question, err := s.questionRepo.GetQuestionById(req.QuestionId)
+	if err != nil {
+		return nil, err
+	}
+
+	xp := 0
+	if req.SelectedOption == question.CorrectOption {
+		xp = question.XP
+	}
+	err = s.sectionRepo.UpdateSectionProgress(userId, question.SectionId, xp)
+	if err != nil {
+		return nil, err
+	}
+
+	return &dto.EvaluateObjectiveAnswerResponse{
+		CorrectOption: question.CorrectOption,
+		Explanation:   question.Explanation,
+		XP:            xp,
+	}, nil
+}
+
+func (s *QuestionService) EvaluateSubjectiveAnswer(userId string, req *dto.EvaluateSubjectiveAnswerReq) (*dto.EvaluateSubjectiveAnswerResponse, error) {
+	question, err := s.questionRepo.GetQuestionById(req.QuestionId)
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := s.userRepo.GetUserById(userId)
+	if err != nil {
+		return nil, err
+	}
+
+	userAnswerEvaluation, err := s.geminiService.EvaluateUserAnswer(user, question, req.UserAnswer)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.sectionRepo.UpdateSectionProgress(userId, question.SectionId, userAnswerEvaluation.XPGained)
+	if err != nil {
+		return nil, err
+	}
+
+	return &dto.EvaluateSubjectiveAnswerResponse{
+		Evaluation: userAnswerEvaluation.Evaluation,
+		BestAnswer: question.BestAnswer,
+		XP:         userAnswerEvaluation.XPGained,
 	}, nil
 }

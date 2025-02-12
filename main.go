@@ -9,13 +9,13 @@ import (
 func main() {
 	firebaseApp, _ := config.InitializeFirebaseApp()
 
+	rdb := config.InitializeRedis()
 	config := config.NewConfig(firebaseApp)
-
-	app := app.NewApp(config)
+	app := app.NewApp(config, rdb)
 	app.Fiber.Use(cors.New(cors.Config{
 		AllowOrigins: "*",
 		AllowHeaders: "Content-Type, Accept",
 	}))
 
-	app.Fiber.Listen(":8000")
+	app.Fiber.Listen("127.0.0.1:8000")
 }

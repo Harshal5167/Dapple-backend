@@ -58,3 +58,65 @@ func (h *QuestionHandler) AddQuestion(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusCreated).JSON(resp)
 }
+
+func (h *QuestionHandler) EvaluateObjectiveAnswer(c *fiber.Ctx) error {
+	userId, ok := c.Locals("userId").(string)
+	if !ok {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid userId",
+		})
+	}
+
+	var req *dto.EvaluateObjectiveAnswerReq
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid request body",
+		})
+	}
+
+	if req.QuestionId == "" || req.SelectedOption<0 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Missing required fields",
+		})
+	}
+
+	resp, err := h.questionService.EvaluateObjectiveAnswer(userId, req)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(resp)
+}
+
+func (h *QuestionHandler) EvaluateSubjectiveAnswer(c *fiber.Ctx) error {
+	userId, ok := c.Locals("userId").(string)
+	if !ok {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid userId",
+		})
+	}
+
+	var req *dto.EvaluateSubjectiveAnswerReq
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid request body",
+		})
+	}
+
+	if req.QuestionId == "" || len(req.UserAnswer)==0 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Missing required fields",
+		})
+	}
+
+	resp, err := h.questionService.EvaluateSubjectiveAnswer(userId, req)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(resp)
+}
