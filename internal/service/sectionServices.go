@@ -1,7 +1,8 @@
 package service
 
 import (
-	"github.com/Harshal5167/Dapple-backend/internal/dto"
+	"github.com/Harshal5167/Dapple-backend/internal/dto/request"
+	"github.com/Harshal5167/Dapple-backend/internal/dto/response"
 	"github.com/Harshal5167/Dapple-backend/internal/interfaces"
 	"github.com/Harshal5167/Dapple-backend/internal/model"
 )
@@ -32,7 +33,7 @@ func NewSectionService(
 	}
 }
 
-func (s *SectionService) AddSection(req *dto.AddSectionRequest) (*dto.AddSectionResponse, error) {
+func (s *SectionService) AddSection(req *request.AddSectionRequest) (*response.AddSectionResponse, error) {
 	sectionId, err := s.sectionRepo.AddSection(model.Section{
 		Name:    req.Name,
 		LevelId: req.LevelId,
@@ -47,12 +48,12 @@ func (s *SectionService) AddSection(req *dto.AddSectionRequest) (*dto.AddSection
 		return nil, err
 	}
 
-	return &dto.AddSectionResponse{
+	return &response.AddSectionResponse{
 		SectionId: sectionId,
 	}, nil
 }
 
-func (s *SectionService) GetSectionData(userId string, sectionId string) (*dto.SectionData, error) {
+func (s *SectionService) GetSectionData(userId string, sectionId string) (*response.SectionData, error) {
 	questions, lessons, err := s.sectionRepo.GetQuestionsAndLessons(sectionId)
 	if err != nil {
 		return nil, err
@@ -67,7 +68,6 @@ func (s *SectionService) GetSectionData(userId string, sectionId string) (*dto.S
 		questionList = append(questionList, map[string]interface{}{
 			"questionId":   questionId,
 			"type":         question.Type,
-			"options":      question.Options,
 			"questionText": question.QuestionText,
 			"imageUrl":     question.ImageUrl,
 			"XP":           question.XP,
@@ -108,14 +108,14 @@ func (s *SectionService) GetSectionData(userId string, sectionId string) (*dto.S
 		return nil, err
 	}
 
-	return &dto.SectionData{
+	return &response.SectionData{
 		Data:            data,
 		SectionProgress: (*progress),
 	}, nil
 }
 
 func (s *SectionService) AddCompleteSection(req *model.SectionData, levelId string) error {
-	addSectionResponse, err := s.AddSection(&dto.AddSectionRequest{
+	addSectionResponse, err := s.AddSection(&request.AddSectionRequest{
 		Name:    req.Name,
 		LevelId: levelId,
 		TotalXP: req.TotalXP,
@@ -125,7 +125,7 @@ func (s *SectionService) AddCompleteSection(req *model.SectionData, levelId stri
 	}
 
 	for _, question := range req.Questions {
-		_, err := s.questionService.AddQuestion(&dto.AddQuestionRequest{
+		_, err := s.questionService.AddQuestion(&request.AddQuestionRequest{
 			QuestionText:  question.QuestionText,
 			Options:       question.Options,
 			CorrectOption: question.CorrectOption,
@@ -142,7 +142,7 @@ func (s *SectionService) AddCompleteSection(req *model.SectionData, levelId stri
 	}
 
 	for _, lesson := range req.Lessons {
-		_, err := s.lessonService.AddLesson(&dto.AddLessonRequest{
+		_, err := s.lessonService.AddLesson(&request.AddLessonRequest{
 			Title:     lesson.Title,
 			Content:   lesson.Content,
 			SectionId: addSectionResponse.SectionId,

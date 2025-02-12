@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"github.com/Harshal5167/Dapple-backend/internal/dto"
+	"github.com/Harshal5167/Dapple-backend/internal/dto/request"
 	"github.com/Harshal5167/Dapple-backend/internal/interfaces"
 	"github.com/Harshal5167/Dapple-backend/internal/model"
 	"github.com/gofiber/fiber/v2"
@@ -18,7 +18,7 @@ func NewQuestionHandler(questionService interfaces.QuestionService) *QuestionHan
 }
 
 func (h *QuestionHandler) AddQuestion(c *fiber.Ctx) error {
-	var req *dto.AddQuestionRequest
+	var req *request.AddQuestionRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Invalid request body",
@@ -67,7 +67,7 @@ func (h *QuestionHandler) EvaluateObjectiveAnswer(c *fiber.Ctx) error {
 		})
 	}
 
-	var req *dto.EvaluateObjectiveAnswerReq
+	var req *request.EvaluateObjectiveAnswerReq
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Invalid request body",
@@ -98,7 +98,7 @@ func (h *QuestionHandler) EvaluateSubjectiveAnswer(c *fiber.Ctx) error {
 		})
 	}
 
-	var req *dto.EvaluateSubjectiveAnswerReq
+	var req *request.EvaluateSubjectiveAnswerReq
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Invalid request body",

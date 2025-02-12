@@ -3,7 +3,8 @@ package service
 import (
 	"fmt"
 
-	"github.com/Harshal5167/Dapple-backend/internal/dto"
+	"github.com/Harshal5167/Dapple-backend/internal/dto/request"
+	"github.com/Harshal5167/Dapple-backend/internal/dto/response"
 	"github.com/Harshal5167/Dapple-backend/internal/interfaces"
 	"github.com/Harshal5167/Dapple-backend/internal/model"
 )
@@ -21,7 +22,7 @@ func NewLessonService(lessonRepo interfaces.LessonRepository, sectionRepo interf
 	}
 }
 
-func (s *LessonService) AddLesson(req *dto.AddLessonRequest) (*dto.AddLessonResponse, error) {
+func (s *LessonService) AddLesson(req *request.AddLessonRequest) (*response.AddLessonResponse, error) {
 	noOfLessons, err := s.sectionRepo.GetNoOfItems(req.SectionId, "lessons")
 	if err != nil {
 		return nil, err
@@ -47,7 +48,7 @@ func (s *LessonService) AddLesson(req *dto.AddLessonRequest) (*dto.AddLessonResp
 		return nil, err
 	}
 
-	return &dto.AddLessonResponse{
+	return &response.AddLessonResponse{
 		LessonId: lessonId,
 	}, nil
 }

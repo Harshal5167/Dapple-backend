@@ -3,7 +3,8 @@ package service
 import (
 	"fmt"
 
-	"github.com/Harshal5167/Dapple-backend/internal/dto"
+	"github.com/Harshal5167/Dapple-backend/internal/dto/request"
+	"github.com/Harshal5167/Dapple-backend/internal/dto/response"
 	"github.com/Harshal5167/Dapple-backend/internal/interfaces"
 	"github.com/Harshal5167/Dapple-backend/internal/model"
 )
@@ -11,10 +12,10 @@ import (
 var MaxNoOfQuestions int = 4
 
 type QuestionService struct {
-	questionRepo   interfaces.QuestionRepository
-	sectionRepo    interfaces.SectionRepository
-	geminiService  interfaces.GeminiService
-	userRepo       interfaces.UserRepository
+	questionRepo      interfaces.QuestionRepository
+	sectionRepo       interfaces.SectionRepository
+	geminiService     interfaces.GeminiService
+	userRepo          interfaces.UserRepository
 	UserCourseService interfaces.UserCourseService
 }
 
@@ -25,15 +26,15 @@ func NewQuestionService(
 	userRepo interfaces.UserRepository,
 	UserCourseService interfaces.UserCourseService) *QuestionService {
 	return &QuestionService{
-		questionRepo:   questionRepo,
-		sectionRepo:    sectionRepo,
-		geminiService:  geminiService,
-		userRepo:       userRepo,
+		questionRepo:      questionRepo,
+		sectionRepo:       sectionRepo,
+		geminiService:     geminiService,
+		userRepo:          userRepo,
 		UserCourseService: UserCourseService,
 	}
 }
 
-func (s *QuestionService) AddQuestion(req *dto.AddQuestionRequest) (*dto.AddQuestionResponse, error) {
+func (s *QuestionService) AddQuestion(req *request.AddQuestionRequest) (*response.AddQuestionResponse, error) {
 	noOfQuestions, err := s.sectionRepo.GetNoOfItems(req.SectionId, "questions")
 	if err != nil {
 		return nil, err
@@ -62,12 +63,12 @@ func (s *QuestionService) AddQuestion(req *dto.AddQuestionRequest) (*dto.AddQues
 		return nil, err
 	}
 
-	return &dto.AddQuestionResponse{
+	return &response.AddQuestionResponse{
 		QuestionId: questionId,
 	}, nil
 }
 
-func (s *QuestionService) EvaluateObjectiveAnswer(userId string, req *dto.EvaluateObjectiveAnswerReq) (*dto.EvaluateObjectiveAnswerResponse, error) {
+func (s *QuestionService) EvaluateObjectiveAnswer(userId string, req *request.EvaluateObjectiveAnswerReq) (*response.EvaluateObjectiveAnswerResponse, error) {
 	question, err := s.questionRepo.GetQuestionById(req.QuestionId)
 	if err != nil {
 		return nil, err
@@ -89,14 +90,14 @@ func (s *QuestionService) EvaluateObjectiveAnswer(userId string, req *dto.Evalua
 		}
 	}
 
-	return &dto.EvaluateObjectiveAnswerResponse{
+	return &response.EvaluateObjectiveAnswerResponse{
 		CorrectOption: question.CorrectOption,
 		Explanation:   question.Explanation,
 		XP:            xp,
 	}, nil
 }
 
-func (s *QuestionService) EvaluateSubjectiveAnswer(userId string, req *dto.EvaluateSubjectiveAnswerReq) (*dto.EvaluateSubjectiveAnswerResponse, error) {
+func (s *QuestionService) EvaluateSubjectiveAnswer(userId string, req *request.EvaluateSubjectiveAnswerReq) (*response.EvaluateSubjectiveAnswerResponse, error) {
 	question, err := s.questionRepo.GetQuestionById(req.QuestionId)
 	if err != nil {
 		return nil, err
@@ -124,9 +125,10 @@ func (s *QuestionService) EvaluateSubjectiveAnswer(userId string, req *dto.Evalu
 		}
 	}
 
-	return &dto.EvaluateSubjectiveAnswerResponse{
+	return &response.EvaluateSubjectiveAnswerResponse{
 		Evaluation: userAnswerEvaluation.Evaluation,
 		BestAnswer: question.BestAnswer,
+		UserAnswer: req.UserAnswer,
 		XP:         userAnswerEvaluation.XPGained,
 	}, nil
 }

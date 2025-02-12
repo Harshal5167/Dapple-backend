@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"github.com/Harshal5167/Dapple-backend/internal/dto"
+	"github.com/Harshal5167/Dapple-backend/internal/dto/request"
 	"github.com/Harshal5167/Dapple-backend/internal/interfaces"
 	"github.com/gofiber/fiber/v2"
 )
@@ -17,7 +17,7 @@ func NewLevelHandler(levelService interfaces.LevelService) *LevelHandler {
 }
 
 func (h *LevelHandler) AddLevel(c *fiber.Ctx) error {
-	var req *dto.AddLevelRequest
+	var req *request.AddLevelRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Invalid request body",
@@ -41,7 +41,7 @@ func (h *LevelHandler) AddLevel(c *fiber.Ctx) error {
 }
 
 func (h *LevelHandler) AddCompleteLevel(c *fiber.Ctx) error {
-	var req *dto.AddCompleteLevelRequest
+	var req *request.AddCompleteLevelRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Invalid request body",

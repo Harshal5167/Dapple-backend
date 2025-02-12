@@ -4,7 +4,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/Harshal5167/Dapple-backend/internal/dto"
+	"github.com/Harshal5167/Dapple-backend/internal/dto/response"
+	"github.com/Harshal5167/Dapple-backend/internal/dto/request"
 	"github.com/Harshal5167/Dapple-backend/internal/interfaces"
 	"github.com/Harshal5167/Dapple-backend/internal/model"
 	"github.com/Harshal5167/Dapple-backend/internal/utils"
@@ -24,7 +25,7 @@ func NewAuthService(authRepository interfaces.AuthRepository, userCourseService 
 	}
 }
 
-func (c *AuthService) Login(reqBody *dto.LoginRequest) (*dto.AuthResponse, error) {
+func (c *AuthService) Login(reqBody *request.LoginRequest) (*response.AuthResponse, error) {
 	isVerified, tokenEmail, err := c.authRepository.VerifyFirebaseToken(reqBody.FirebaseToken)
 	if err != nil {
 		return nil, err
@@ -48,7 +49,7 @@ func (c *AuthService) Login(reqBody *dto.LoginRequest) (*dto.AuthResponse, error
 	if err != nil {
 		return nil, err
 	}
-	return &dto.AuthResponse{
+	return &response.AuthResponse{
 			Token:     token,
 			FirstName: user.FirstName,
 			XP:        user.XP,
@@ -56,7 +57,7 @@ func (c *AuthService) Login(reqBody *dto.LoginRequest) (*dto.AuthResponse, error
 		nil
 }
 
-func (c *AuthService) Register(reqBody *dto.RegisterRequest) (*dto.AuthResponse, error) {
+func (c *AuthService) Register(reqBody *request.RegisterRequest) (*response.AuthResponse, error) {
 	isVerified, tokenEmail, err := c.authRepository.VerifyFirebaseToken(reqBody.FirebaseToken)
 	if err != nil {
 		return nil, err
@@ -98,7 +99,7 @@ func (c *AuthService) Register(reqBody *dto.RegisterRequest) (*dto.AuthResponse,
 	if err != nil {
 		return nil, err
 	}
-	return &dto.AuthResponse{
+	return &response.AuthResponse{
 			Token:     token,
 			FirstName: reqBody.FirstName,
 			XP:        0,

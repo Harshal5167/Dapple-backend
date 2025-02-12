@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"github.com/Harshal5167/Dapple-backend/internal/dto"
+	"github.com/Harshal5167/Dapple-backend/internal/dto/request"
 	"github.com/Harshal5167/Dapple-backend/internal/interfaces"
 	"github.com/gofiber/fiber/v2"
 )
@@ -17,7 +17,7 @@ func NewLessonHandler(lessonService interfaces.LessonService) *LessonHandler {
 }
 
 func (h *LessonHandler) AddLesson(c *fiber.Ctx) error {
-	var req *dto.AddLessonRequest
+	var req *request.AddLessonRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "invalid request body",

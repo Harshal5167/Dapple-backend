@@ -1,7 +1,7 @@
 package interfaces
 
 import (
-	"github.com/Harshal5167/Dapple-backend/internal/dto"
+	"github.com/Harshal5167/Dapple-backend/internal/dto/response"
 	"github.com/Harshal5167/Dapple-backend/internal/model"
 )
 
@@ -38,7 +38,7 @@ type LessonRepository interface {
 }
 
 type UserCourseRepository interface {
-	AddUserCourse(userId string, levelsForUser *dto.LevelsForUser) error
+	AddUserCourse(userId string, levelsForUser *response.LevelsForUser) error
 	GetUserCourse(userId string) (*model.UserCourse, error)
 	UpdateUserProgress(userId string, levelInc bool) error
 }

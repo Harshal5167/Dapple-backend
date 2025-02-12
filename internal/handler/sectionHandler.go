@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"github.com/Harshal5167/Dapple-backend/internal/dto"
+	"github.com/Harshal5167/Dapple-backend/internal/dto/request"
 	"github.com/Harshal5167/Dapple-backend/internal/interfaces"
 	"github.com/gofiber/fiber/v2"
 )
@@ -17,7 +17,7 @@ func NewSectionHandler(sectionService interfaces.SectionService) *SectionHandler
 }
 
 func (h *SectionHandler) AddSection(c *fiber.Ctx) error {
-	var req *dto.AddSectionRequest
+	var req *request.AddSectionRequest
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Invalid request body",
@@ -71,7 +71,7 @@ func (h *SectionHandler) UpdateSectionProgress(c *fiber.Ctx) error {
 		})
 	}
 
-	var req *dto.UpdateSectionProgress
+	var req *request.UpdateSectionProgress
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Invalid request body",

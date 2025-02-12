@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"github.com/Harshal5167/Dapple-backend/internal/dto"
+	"github.com/Harshal5167/Dapple-backend/internal/dto/request"
 	"github.com/Harshal5167/Dapple-backend/internal/interfaces"
 	"github.com/gofiber/fiber/v2"
 )
@@ -15,7 +15,7 @@ func NewAuthHandler(authService interfaces.AuthService) *AuthHandler {
 }
 
 func (h *AuthHandler) Login(c *fiber.Ctx) error {
-	var reqBody *dto.LoginRequest
+	var reqBody *request.LoginRequest
 
 	if err := c.BodyParser(&reqBody); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -39,7 +39,7 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 }
 
 func (h *AuthHandler) Register(c *fiber.Ctx) error {
-	var reqBody *dto.RegisterRequest
+	var reqBody *request.RegisterRequest
 
 	if err := c.BodyParser(&reqBody); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{

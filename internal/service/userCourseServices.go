@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/Harshal5167/Dapple-backend/data"
-	"github.com/Harshal5167/Dapple-backend/internal/dto"
+	"github.com/Harshal5167/Dapple-backend/internal/dto/response"
 	"github.com/Harshal5167/Dapple-backend/internal/interfaces"
 	"github.com/Harshal5167/Dapple-backend/internal/model"
 )
@@ -58,7 +58,7 @@ func (s *UserCourseService) TailorUserCourse(userId string, user model.User) err
 	return nil
 }
 
-func (s *UserCourseService) GetUserCourse(userId string) (*dto.UserCourseResponse, error) {
+func (s *UserCourseService) GetUserCourse(userId string) (*response.UserCourseResponse, error) {
 	userCourse, err := s.userCourseRepo.GetUserCourse(userId)
 	if err != nil {
 		return nil, err
@@ -73,7 +73,7 @@ func (s *UserCourseService) GetUserCourse(userId string) (*dto.UserCourseRespons
 		levels = append(levels, *level)
 	}
 
-	return &dto.UserCourseResponse{
+	return &response.UserCourseResponse{
 		Levels:      levels,
 		SectionData: data.SectionData,
 		UserProgess: userCourse.UserProgress,

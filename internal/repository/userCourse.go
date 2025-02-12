@@ -4,7 +4,7 @@ import (
 	"context"
 
 	firebase "firebase.google.com/go/v4"
-	"github.com/Harshal5167/Dapple-backend/internal/dto"
+	"github.com/Harshal5167/Dapple-backend/internal/dto/response"
 	"github.com/Harshal5167/Dapple-backend/internal/model"
 )
 
@@ -18,7 +18,7 @@ func NewUserCourseRepository(firebaseApp *firebase.App) *UserCourseRepository {
 	}
 }
 
-func (r *UserCourseRepository) AddUserCourse(userId string, levelsForUser *dto.LevelsForUser) error {
+func (r *UserCourseRepository) AddUserCourse(userId string, levelsForUser *response.LevelsForUser) error {
 	ctx := context.Background()
 
 	client, err := r.firebaseApp.Database(ctx)

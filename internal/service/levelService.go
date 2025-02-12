@@ -1,7 +1,8 @@
 package service
 
 import (
-	"github.com/Harshal5167/Dapple-backend/internal/dto"
+	"github.com/Harshal5167/Dapple-backend/internal/dto/request"
+	"github.com/Harshal5167/Dapple-backend/internal/dto/response"
 	"github.com/Harshal5167/Dapple-backend/internal/interfaces"
 	"github.com/Harshal5167/Dapple-backend/internal/model"
 )
@@ -18,7 +19,7 @@ func NewLevelService(levelRepo interfaces.LevelRepository, sectionService interf
 	}
 }
 
-func (s *LevelService) AddLevel(req *dto.AddLevelRequest) (*dto.AddLevelResponse, error) {
+func (s *LevelService) AddLevel(req *request.AddLevelRequest) (*response.AddLevelResponse, error) {
 	levelId, err := s.levelRepo.AddLevel(model.Level{
 		Name:        req.Name,
 		Description: req.Description,
@@ -28,12 +29,12 @@ func (s *LevelService) AddLevel(req *dto.AddLevelRequest) (*dto.AddLevelResponse
 		return nil, err
 	}
 
-	return &dto.AddLevelResponse{
+	return &response.AddLevelResponse{
 		LevelId: levelId,
 	}, nil
 }
 
-func (s *LevelService) AddCompleteLevel(req *dto.AddCompleteLevelRequest) (*dto.AddLevelResponse, error) {
+func (s *LevelService) AddCompleteLevel(req *request.AddCompleteLevelRequest) (*response.AddLevelResponse, error) {
 	levelId, err := s.levelRepo.AddLevel(model.Level{
 		Name:        req.Level.Name,
 		Description: req.Level.Description,
@@ -54,7 +55,7 @@ func (s *LevelService) AddCompleteLevel(req *dto.AddCompleteLevelRequest) (*dto.
 			return nil, err
 		}
 	}
-	return &dto.AddLevelResponse{
+	return &response.AddLevelResponse{
 		LevelId: levelId,
 	}, nil
 }

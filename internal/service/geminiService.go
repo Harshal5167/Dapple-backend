@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Harshal5167/Dapple-backend/internal/dto"
+	"github.com/Harshal5167/Dapple-backend/internal/dto/response"
 	"github.com/Harshal5167/Dapple-backend/internal/interfaces"
 	"github.com/Harshal5167/Dapple-backend/internal/model"
 	"github.com/Harshal5167/Dapple-backend/internal/utils"
@@ -23,7 +23,7 @@ func NewGeminiService(client *genai.Client) interfaces.GeminiService {
 	}
 }
 
-func (s *geminiService) GenerateUserCourse(user model.User, levelDetails []map[string]string) (*dto.LevelsForUser, error) {
+func (s *geminiService) GenerateUserCourse(user model.User, levelDetails []map[string]string) (*response.LevelsForUser, error) {
 	ctx := context.Background()
 	model := s.client.GenerativeModel("gemini-1.0-pro")
 
@@ -93,7 +93,7 @@ func (s *geminiService) GenerateUserCourse(user model.User, levelDetails []map[s
 
 	fmt.Println(responseText.String())
 
-	var response dto.LevelsForUser
+	var response response.LevelsForUser
 	err = json.Unmarshal([]byte(responseText.String()), &response)
 	if err != nil {
 		return nil, fmt.Errorf("parsing error: %v", err)
