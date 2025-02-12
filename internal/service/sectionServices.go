@@ -70,6 +70,7 @@ func (s *SectionService) GetSectionData(userId string, sectionId string) (*dto.S
 			"options":      question.Options,
 			"questionText": question.QuestionText,
 			"imageUrl":     question.ImageUrl,
+			"XP":           question.XP,
 		})
 	}
 

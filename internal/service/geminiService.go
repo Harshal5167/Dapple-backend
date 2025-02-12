@@ -30,7 +30,7 @@ func (s *geminiService) GenerateUserCourse(user model.User, levelDetails []map[s
 	promptTemplate := `You are a neurodiverse expert which focuses on overcoming social interactions anxiety and teach patients social cues.
 	You have to design a course for user which will help them to overcome their social anxiety and improve their social skills.
 	We are providing you with some available content which has been designed by our team. You have to select the most suitable content for the user based on their profile.
-	Please analyze the following user profile and available levels to select the 3 most suitable levels for this user.
+	Please analyze the following user profile and available levels to select the 1 most suitable levels for this user.
 
 	User Profile:
 	- FirstName: %s
@@ -41,11 +41,11 @@ func (s *geminiService) GenerateUserCourse(user model.User, levelDetails []map[s
 	- SocialChallenges: %s
 	- StrugglingSocialSetting: %s
 
-	Analyze this user info and indentify the problems it has then provide him the solution by suggesting 3 levels from the available levels which will be best for him to overcome his fears and problems.
+	Analyze this user info and indentify the problems it has then provide him the solution by suggesting 1 levels from the available levels which will be best for him to overcome his fears and problems.
 	
 	Available Levels: %s
 	
-	Please select exactly 3 levels that would be most appropriate for this user based on their profile. Consider the following factors:
+	Please select exactly 1 levels that would be most appropriate for this user based on their profile. Consider the following factors:
 	1. User's age 
 	2. Alignment with his profession and gender.
 	3. Help him overcome his social challenges.
@@ -57,7 +57,7 @@ func (s *geminiService) GenerateUserCourse(user model.User, levelDetails []map[s
 			"levelId"
 		]
 	}
-	Note that you have to select exactly 3 levels so the selectedLevels should contains 3 levelIds.
+	Note that you have to select exactly 1 levels so the selectedLevels should contains 1 levelIds.
 	`
 
 	levelDetailsString := utils.BuildStringForLevels(levelDetails)
@@ -99,7 +99,7 @@ func (s *geminiService) GenerateUserCourse(user model.User, levelDetails []map[s
 		return nil, fmt.Errorf("parsing error: %v", err)
 	}
 
-	if len(response.SelectedLevelIds) != 3 {
+	if len(response.SelectedLevelIds) != 1 {
 		return nil, fmt.Errorf("error generating levels for user")
 	}
 
@@ -141,11 +141,11 @@ func (s *geminiService) EvaluateUserAnswer(user *model.User, question *model.Que
 			"Evaluation":[
 				{
 					"title": "key concepts to focus while answering",
-					"content": "Evaluate how well the user's response aligns with social norms, emotional intelligence, and effective communication strategies. Focus on aspects like active listening, conversational flow, confidence, and non-verbal cues. Ensure the user understands how to engage appropriately in different social settings based on their specific challenges." (string)
+					"content": "Evaluate how well the user's response aligns with social norms, emotional intelligence, and effective communication strategies. Focus on aspects like active listening, conversational flow, confidence, and non-verbal cues. Ensure the user understands how to engage appropriately in different social settings based on their specific challenges. this field should not contain more than 25 words"
 				},
 				{
 					"title": "key points to answer better",
-					"content": "Provide actionable improvements tailored to the user's social struggles. Offer guidance on structuring responses more effectively, using open-ended engagement, showing empathy, and maintaining clarity. Highlight specific techniques such as mirroring, tone modulation, or asking follow-up questions to improve interaction quality. Compare the response with the best answer and suggest personalized tweaks for better alignment." (string)
+					"content": "Provide actionable improvements tailored to the user's social struggles. Offer guidance on structuring responses more effectively, using open-ended engagement, showing empathy, and maintaining clarity. Highlight specific techniques such as mirroring, tone modulation, or asking follow-up questions to improve interaction quality. Compare the response with the best answer and suggest personalized tweaks for better alignment. this field should not contain more than 25 words"
 				},
 			],
 			"xpGained": "based on the user answer give him a xp which you think he should get out of the total xp of that question. also the xp should be in multiple of 10 like 10,20,30,... and should not exceed the total xp of the question and not 0." (int)
@@ -185,7 +185,9 @@ func (s *geminiService) EvaluateUserAnswer(user *model.User, question *model.Que
 		responseText += fmt.Sprintf("%v", part)
 	}
 
-	var response *model.UserAnswerEvalutaion
+	fmt.Println(responseText)
+
+	response := &model.UserAnswerEvalutaion{}
 	err = json.Unmarshal([]byte(responseText), response)
 	if err != nil {
 		return nil, fmt.Errorf("parsing error: %v", err)

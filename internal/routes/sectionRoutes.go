@@ -20,6 +20,6 @@ func (r *SectionRoutes) SectionRoutes(app *fiber.App) {
 	api := app.Group("/api")
 	section := api.Group("/section")
 	section.Post("/", r.sectionHandler.AddSection)
-	section.Get("/:sectionId", middleware.IsAuth, r.sectionHandler.GetSection)
 	section.Put("/update-section-progress", middleware.IsAuth, r.sectionHandler.UpdateSectionProgress)
+	section.Get("/:sectionId", middleware.IsAuth, r.sectionHandler.GetSection)
 }

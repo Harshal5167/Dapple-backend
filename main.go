@@ -17,5 +17,5 @@ func main() {
 		AllowHeaders: "Content-Type, Accept",
 	}))
 
-	app.Fiber.Listen("127.0.0.1:8000")
+	app.Fiber.Listen(":8000")
 }

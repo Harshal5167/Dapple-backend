@@ -121,13 +121,13 @@ func (c *SectionRepository) StoreSectionProgress(userId string, sectionId string
 	ctx := context.Background()
 	key := fmt.Sprintf("user:%s:section:%s", userId, sectionId)
 
-	var sectionProgress *model.SectionProgress
-	err := c.rdb.HGetAll(ctx, key).Scan(&sectionProgress)
+	sectionProgress := &model.SectionProgress{}
+	err := c.rdb.HGetAll(ctx, key).Scan(sectionProgress)
 	if err != nil {
 		return nil, err
 	}
 
-	if sectionProgress != nil {
+	if sectionProgress.Progress != 0 && sectionProgress.XP != 0 {
 		return sectionProgress, nil
 	}
 
