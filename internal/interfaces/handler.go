@@ -24,6 +24,7 @@ type QuestionHandler interface {
 	AddQuestion(c *fiber.Ctx) error
 	EvaluateObjectiveAnswer(c *fiber.Ctx) error
 	EvaluateSubjectiveAnswer(c *fiber.Ctx) error
+	GetHint(c *fiber.Ctx) error
 }
 
 type LessonHandler interface {

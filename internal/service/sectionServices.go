@@ -128,6 +128,7 @@ func (s *SectionService) AddCompleteSection(req *model.SectionData, levelId stri
 		_, err := s.questionService.AddQuestion(&request.AddQuestionRequest{
 			QuestionText:  question.QuestionText,
 			Options:       question.Options,
+			Hint:          question.Hint,
 			CorrectOption: question.CorrectOption,
 			SectionId:     addSectionResponse.SectionId,
 			ImageUrl:      question.ImageUrl,

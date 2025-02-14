@@ -120,3 +120,21 @@ func (h *QuestionHandler) EvaluateSubjectiveAnswer(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(resp)
 }
+
+func (h *QuestionHandler) GetHint(c *fiber.Ctx) error {
+	questionId := c.Params("questionId")
+	if questionId == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Missing questionId",
+		})
+	}
+
+	resp, err := h.questionService.GetHint(questionId)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(resp)
+}

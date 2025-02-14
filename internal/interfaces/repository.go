@@ -30,6 +30,7 @@ type SectionRepository interface {
 type QuestionRepository interface {
 	AddQuestion(question model.Question) (string, error)
 	GetQuestionById(questionId string) (*model.Question, error)
+	GetHint(questionId string) (string, error)
 }
 
 type LessonRepository interface {

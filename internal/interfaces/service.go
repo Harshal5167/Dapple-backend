@@ -27,6 +27,7 @@ type QuestionService interface {
 	AddQuestion(req *request.AddQuestionRequest) (*response.AddQuestionResponse, error)
 	EvaluateSubjectiveAnswer(userId string, req *request.EvaluateSubjectiveAnswerReq) (*response.EvaluateSubjectiveAnswerResponse, error)
 	EvaluateObjectiveAnswer(userId string, req *request.EvaluateObjectiveAnswerReq) (*response.EvaluateObjectiveAnswerResponse, error)
+	GetHint(questionId string) (*response.GetHintResponse, error)
 }
 
 type LessonService interface {

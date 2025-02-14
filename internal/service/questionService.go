@@ -47,6 +47,7 @@ func (s *QuestionService) AddQuestion(req *request.AddQuestionRequest) (*respons
 		QuestionText:  req.QuestionText,
 		XP:            req.XP,
 		Type:          req.Type,
+		Hint:          req.Hint,
 		Options:       req.Options,
 		ImageUrl:      req.ImageUrl,
 		CorrectOption: req.CorrectOption,
@@ -130,5 +131,16 @@ func (s *QuestionService) EvaluateSubjectiveAnswer(userId string, req *request.E
 		BestAnswer: question.BestAnswer,
 		UserAnswer: req.UserAnswer,
 		XP:         userAnswerEvaluation.XPGained,
+	}, nil
+}
+
+func (s *QuestionService) GetHint(questionId string) (*response.GetHintResponse, error) {
+	hint, err := s.questionRepo.GetHint(questionId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response.GetHintResponse{
+		Hint: hint,
 	}, nil
 }

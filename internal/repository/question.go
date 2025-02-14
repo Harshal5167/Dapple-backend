@@ -46,3 +46,18 @@ func (c *QuestionRepository) GetQuestionById(questionId string) (*model.Question
 
 	return &question, nil
 }
+
+func (c *QuestionRepository) GetHint(questionId string) (string, error) {
+	ctx := context.Background()
+
+	client, err := c.firebaseApp.Database(ctx)
+	if err != nil {
+		return "", err
+	}
+
+	var hint string
+	if err := client.NewRef("questions").Child(questionId).Child("hint").Get(ctx, &hint); err != nil {
+		return "", err
+	}
+	return hint, nil
+}

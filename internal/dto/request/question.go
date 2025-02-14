@@ -7,6 +7,7 @@ type AddQuestionRequest struct {
 	ImageUrl      string             `json:"imageUrl,omitempty"`
 	Type          model.QuestionType `json:"type"`
 	Options       []string           `json:"options,omitempty"`
+	Hint          string             `json:"hint,omitempty"`
 	CorrectOption int                `json:"correctOption,omitzero"`
 	BestAnswer    []string           `json:"bestAnswer,omitempty"`
 	SectionId     string             `json:"sectionId"`

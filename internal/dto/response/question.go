@@ -18,3 +18,7 @@ type EvaluateSubjectiveAnswerResponse struct {
 	UserAnswer []string           `json:"userAnswer"`
 	XP         int                `json:"xp"`
 }
+
+type GetHintResponse struct {
+	Hint string `json:"hint"`
+}
