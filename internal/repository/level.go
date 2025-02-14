@@ -3,29 +3,25 @@ package repository
 import (
 	"context"
 
-	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/db"
 	"github.com/Harshal5167/Dapple-backend/internal/model"
 )
 
 type LevelRepository struct {
-	firebaseApp *firebase.App
+	firebaseDB *db.Client
 }
 
-func NewLevelRepository(firebase *firebase.App) *LevelRepository {
-	return &LevelRepository{firebaseApp: firebase}
+func NewLevelRepository(db *db.Client) *LevelRepository {
+	return &LevelRepository{
+		firebaseDB: db,
+	}
 }
 
 func (c *LevelRepository) AddLevel(level model.Level) (string, error) {
 	ctx := context.Background()
 
-	client, err := c.firebaseApp.Database(ctx)
-	if err != nil {
-		return "", err
-	}
-
 	var ref *db.Ref
-	ref, err = client.NewRef("levels").Push(ctx, level)
+	ref, err := c.firebaseDB.NewRef("levels").Push(ctx, level)
 	if err != nil {
 		return "", err
 	}
@@ -36,14 +32,9 @@ func (c *LevelRepository) AddLevel(level model.Level) (string, error) {
 func (c *LevelRepository) AddSectionToLevel(levelId string, sectionId string) error {
 	ctx := context.Background()
 
-	client, err := c.firebaseApp.Database(ctx)
-	if err != nil {
-		return err
-	}
-
-	ref := client.NewRef("levels").Child(levelId).Child("sections")
+	ref := c.firebaseDB.NewRef("levels").Child(levelId).Child("sections")
 	var sections []string
-	err = ref.Get(ctx, &sections)
+	err := ref.Get(ctx, &sections)
 	if err != nil {
 		return err
 	}
@@ -56,7 +47,7 @@ func (c *LevelRepository) AddSectionToLevel(levelId string, sectionId string) er
 	}
 
 	if lastSectionId != "" {
-		err = client.NewRef("sections").Child(lastSectionId).Child("nextSectionId").Set(ctx, sectionId)
+		err := c.firebaseDB.NewRef("sections").Child(lastSectionId).Child("nextSectionId").Set(ctx, sectionId)
 		if err != nil {
 			return err
 		}
@@ -73,13 +64,8 @@ func (c *LevelRepository) AddSectionToLevel(levelId string, sectionId string) er
 func (c *LevelRepository) GetAllLevels() (map[string]model.Level, error) {
 	ctx := context.Background()
 
-	client, err := c.firebaseApp.Database(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	var levels map[string]model.Level
-	err = client.NewRef("levels").Get(ctx, &levels)
+	err := c.firebaseDB.NewRef("levels").Get(ctx, &levels)
 	if err != nil {
 		return nil, err
 	}
@@ -90,13 +76,8 @@ func (c *LevelRepository) GetAllLevels() (map[string]model.Level, error) {
 func (c *LevelRepository) GetLevelById(levelId string) (*model.Level, error) {
 	ctx := context.Background()
 
-	client, err := c.firebaseApp.Database(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	var level *model.Level
-	err = client.NewRef("levels").Child(levelId).Get(ctx, &level)
+	err := c.firebaseDB.NewRef("levels").Child(levelId).Get(ctx, &level)
 	if err != nil {
 		return nil, err
 	}

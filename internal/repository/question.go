@@ -3,27 +3,24 @@ package repository
 import (
 	"context"
 
-	firebase "firebase.google.com/go/v4"
+	"firebase.google.com/go/v4/db"
 	"github.com/Harshal5167/Dapple-backend/internal/model"
 )
 
 type QuestionRepository struct {
-	firebaseApp *firebase.App
+	firebaseDB *db.Client
 }
 
-func NewQuestionRepository(firebase *firebase.App) *QuestionRepository {
-	return &QuestionRepository{firebaseApp: firebase}
+func NewQuestionRepository(db *db.Client) *QuestionRepository {
+	return &QuestionRepository{
+		firebaseDB: db,
+	}
 }
 
 func (c *QuestionRepository) AddQuestion(question model.Question) (string, error) {
 	ctx := context.Background()
 
-	client, err := c.firebaseApp.Database(ctx)
-	if err != nil {
-		return "", err
-	}
-
-	ref, err := client.NewRef("questions").Push(ctx, question)
+	ref, err := c.firebaseDB.NewRef("questions").Push(ctx, question)
 	if err != nil {
 		return "", err
 	}
@@ -34,13 +31,8 @@ func (c *QuestionRepository) AddQuestion(question model.Question) (string, error
 func (c *QuestionRepository) GetQuestionById(questionId string) (*model.Question, error) {
 	ctx := context.Background()
 
-	client, err := c.firebaseApp.Database(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	var question model.Question
-	if err := client.NewRef("questions").Child(questionId).Get(ctx, &question); err != nil {
+	if err := c.firebaseDB.NewRef("questions").Child(questionId).Get(ctx, &question); err != nil {
 		return nil, err
 	}
 
@@ -50,13 +42,8 @@ func (c *QuestionRepository) GetQuestionById(questionId string) (*model.Question
 func (c *QuestionRepository) GetHint(questionId string) (string, error) {
 	ctx := context.Background()
 
-	client, err := c.firebaseApp.Database(ctx)
-	if err != nil {
-		return "", err
-	}
-
 	var hint string
-	if err := client.NewRef("questions").Child(questionId).Child("hint").Get(ctx, &hint); err != nil {
+	if err := c.firebaseDB.NewRef("questions").Child(questionId).Child("hint").Get(ctx, &hint); err != nil {
 		return "", err
 	}
 	return hint, nil

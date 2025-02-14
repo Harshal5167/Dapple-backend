@@ -136,6 +136,7 @@ func (s *geminiService) EvaluateUserAnswer(user *model.User, question *model.Que
 	
 		Analyze the user answer based on his profile and question and create a personalized feedback for him in the below given format.
 		You have to provide feedback like key concepts which he/she should focus while answering such questions and key points to answer better after evaluating his response.
+		Don't add his name anywhere in the response that was given to you just for reference.
 		Return your response in the following JSON format:
 		{
 			"Evaluation":[
@@ -146,7 +147,7 @@ func (s *geminiService) EvaluateUserAnswer(user *model.User, question *model.Que
 				{
 					"title": "key points to answer better",
 					"content": "Provide actionable improvements tailored to the user's social struggles. Offer guidance on structuring responses more effectively, using open-ended engagement, showing empathy, and maintaining clarity. Highlight specific techniques such as mirroring, tone modulation, or asking follow-up questions to improve interaction quality. Compare the response with the best answer and suggest personalized tweaks for better alignment. this field should not contain more than 25 words"
-				},
+				}
 			],
 			"xpGained": "based on the user answer give him a xp which you think he should get out of the total xp of that question. also the xp should be in multiple of 10 like 10,20,30,... and should not exceed the total xp of the question and not 0." (int)
 		}
@@ -192,5 +193,6 @@ func (s *geminiService) EvaluateUserAnswer(user *model.User, question *model.Que
 	if err != nil {
 		return nil, fmt.Errorf("parsing error: %v", err)
 	}
+
 	return response, nil
 }

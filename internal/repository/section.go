@@ -4,34 +4,28 @@ import (
 	"context"
 	"fmt"
 
-	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/db"
 	"github.com/Harshal5167/Dapple-backend/internal/model"
 	"github.com/redis/go-redis/v9"
 )
 
 type SectionRepository struct {
-	firebaseApp *firebase.App
-	rdb         *redis.Client
+	firebaseDB *db.Client
+	rdb        *redis.Client
 }
 
-func NewSectionRepository(firebase *firebase.App, rdb *redis.Client) *SectionRepository {
+func NewSectionRepository(db *db.Client, rdb *redis.Client) *SectionRepository {
 	return &SectionRepository{
-		firebaseApp: firebase,
-		rdb:         rdb,
+		firebaseDB: db,
+		rdb:        rdb,
 	}
 }
 
 func (c *SectionRepository) AddSection(section model.Section) (string, error) {
 	ctx := context.Background()
 
-	client, err := c.firebaseApp.Database(ctx)
-	if err != nil {
-		return "", err
-	}
-
 	var ref *db.Ref
-	ref, err = client.NewRef("sections").Push(ctx, section)
+	ref, err := c.firebaseDB.NewRef("sections").Push(ctx, section)
 	if err != nil {
 		return "", err
 	}
@@ -41,13 +35,9 @@ func (c *SectionRepository) AddSection(section model.Section) (string, error) {
 func (c *SectionRepository) GetNoOfItems(sectionId string, itemType string) (int, error) {
 	ctx := context.Background()
 
-	client, err := c.firebaseApp.Database(ctx)
-	if err != nil {
-		return 0, err
-	}
-	ref := client.NewRef("sections").Child(sectionId).Child(itemType)
+	ref := c.firebaseDB.NewRef("sections").Child(sectionId).Child(itemType)
 	var items []string
-	err = ref.Get(ctx, &items)
+	err := ref.Get(ctx, &items)
 	if err != nil {
 		return 0, err
 	}
@@ -57,13 +47,8 @@ func (c *SectionRepository) GetNoOfItems(sectionId string, itemType string) (int
 func (c *SectionRepository) AddQuestionToSection(sectionId string, questionId string) error {
 	ctx := context.Background()
 
-	client, err := c.firebaseApp.Database(ctx)
-	if err != nil {
-		return err
-	}
-
-	ref := client.NewRef("sections").Child(sectionId).Child("questions")
-	err = ref.Transaction(ctx, func(node db.TransactionNode) (interface{}, error) {
+	ref := c.firebaseDB.NewRef("sections").Child(sectionId).Child("questions")
+	err := ref.Transaction(ctx, func(node db.TransactionNode) (interface{}, error) {
 		var questions []string
 		if err := node.Unmarshal(&questions); err != nil {
 			return nil, err
@@ -80,14 +65,9 @@ func (c *SectionRepository) AddQuestionToSection(sectionId string, questionId st
 func (c *SectionRepository) AddLessonToSection(sectionId string, lessonId string) error {
 	ctx := context.Background()
 
-	client, err := c.firebaseApp.Database(ctx)
-	if err != nil {
-		return err
-	}
+	ref := c.firebaseDB.NewRef("sections").Child(sectionId).Child("lessons")
 
-	ref := client.NewRef("sections").Child(sectionId).Child("lessons")
-
-	err = ref.Transaction(ctx, func(node db.TransactionNode) (interface{}, error) {
+	err := ref.Transaction(ctx, func(node db.TransactionNode) (interface{}, error) {
 		var lessons []string
 		if err := node.Unmarshal(&lessons); err != nil {
 			return nil, err
@@ -104,13 +84,8 @@ func (c *SectionRepository) AddLessonToSection(sectionId string, lessonId string
 func (c *SectionRepository) GetQuestionsAndLessons(sectionId string) ([]string, []string, error) {
 	ctx := context.Background()
 
-	client, err := c.firebaseApp.Database(ctx)
-	if err != nil {
-		return nil, nil, err
-	}
-
 	var section model.Section
-	if err = client.NewRef("sections").Child(sectionId).Get(ctx, &section); err != nil {
+	if err := c.firebaseDB.NewRef("sections").Child(sectionId).Get(ctx, &section); err != nil {
 		return nil, nil, err
 	}
 
@@ -127,7 +102,7 @@ func (c *SectionRepository) StoreSectionProgress(userId string, sectionId string
 		return nil, err
 	}
 
-	if sectionProgress.Progress != 0 && sectionProgress.XP != 0 {
+	if sectionProgress.Progress != 0 {
 		return sectionProgress, nil
 	}
 
@@ -177,14 +152,8 @@ func (c *SectionRepository) UpdateSectionProgress(userId string, sectionId strin
 
 func (c *SectionRepository) GetNextSectionId(sectionId string) (string, error) {
 	ctx := context.Background()
-
-	client, err := c.firebaseApp.Database(ctx)
-	if err != nil {
-		return "", err
-	}
-
 	var nextSectionId string
-	err = client.NewRef("sections").Child(sectionId).Child("nextSectionId").Get(ctx, &nextSectionId)
+	err := c.firebaseDB.NewRef("sections").Child(sectionId).Child("nextSectionId").Get(ctx, &nextSectionId)
 	if err != nil {
 		return "", err
 	}

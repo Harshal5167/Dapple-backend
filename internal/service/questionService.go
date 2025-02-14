@@ -79,7 +79,7 @@ func (s *QuestionService) EvaluateObjectiveAnswer(userId string, req *request.Ev
 	if req.SelectedOption == question.CorrectOption {
 		xp = question.XP
 	}
-	progress,_, err := s.sectionRepo.UpdateSectionProgress(userId, question.SectionId, xp)
+	progress, _, err := s.sectionRepo.UpdateSectionProgress(userId, question.SectionId, xp)
 	if err != nil {
 		return nil, err
 	}
@@ -114,7 +114,7 @@ func (s *QuestionService) EvaluateSubjectiveAnswer(userId string, req *request.E
 		return nil, err
 	}
 
-	progress,xp, err := s.sectionRepo.UpdateSectionProgress(userId, question.SectionId, userAnswerEvaluation.XPGained)
+	progress, xp, err := s.sectionRepo.UpdateSectionProgress(userId, question.SectionId, userAnswerEvaluation.XPGained)
 	if err != nil {
 		return nil, err
 	}

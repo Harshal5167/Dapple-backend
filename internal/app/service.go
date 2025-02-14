@@ -5,7 +5,7 @@ import (
 )
 
 func (a *App) InitializeServices() {
-	a.Services.GeminiService = service.NewGeminiService(a.config.GeminiModel)
+	a.Services.GeminiService = service.NewGeminiService(a.config.Genai)
 	a.Services.UserCourseService = service.NewUserCourseService(
 		a.Repositories.UserCourseRepo,
 		a.Repositories.LevelRepo,

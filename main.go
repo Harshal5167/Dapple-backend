@@ -7,11 +7,8 @@ import (
 )
 
 func main() {
-	firebaseApp, _ := config.InitializeFirebaseApp()
-
-	rdb := config.InitializeRedis()
-	config := config.NewConfig(firebaseApp)
-	app := app.NewApp(config, rdb)
+	config := config.NewConfig()
+	app := app.NewApp(config)
 	app.Fiber.Use(cors.New(cors.Config{
 		AllowOrigins: "*",
 		AllowHeaders: "Content-Type, Accept",

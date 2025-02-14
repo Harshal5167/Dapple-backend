@@ -2,26 +2,22 @@ package repository
 
 import (
 	"context"
-	firebase "firebase.google.com/go/v4"
+
+	"firebase.google.com/go/v4/auth"
 )
 
 type AuthRepository struct {
-	FirebaseApp *firebase.App
+	firebaseAuth *auth.Client
 }
 
-func NewAuthRepository(firebase *firebase.App) *AuthRepository {
-	return &AuthRepository{FirebaseApp: firebase}
+func NewAuthRepository(auth *auth.Client) *AuthRepository {
+	return &AuthRepository{
+		firebaseAuth: auth,
+	}
 }
 
 func (c *AuthRepository) VerifyFirebaseToken(token string) (bool, string, error) {
-	ctx := context.Background()
-
-	client, err := c.FirebaseApp.Auth(ctx)
-	if err != nil {
-		return false, "", err
-	}
-
-	verifiedToken, err := client.VerifyIDToken(ctx, token)
+	verifiedToken, err := c.firebaseAuth.VerifyIDToken(context.Background(), token)
 	if err != nil {
 		return false, "", err
 	}

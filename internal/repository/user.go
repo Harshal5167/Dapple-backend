@@ -4,27 +4,24 @@ import (
 	"context"
 	"fmt"
 
-	firebase "firebase.google.com/go/v4"
+	"firebase.google.com/go/v4/db"
 	"github.com/Harshal5167/Dapple-backend/internal/model"
 )
 
 type UserRepository struct {
-	FirebaseApp *firebase.App
+	firebaseDB *db.Client
 }
 
-func NewUserRepository(firebase *firebase.App) *UserRepository {
-	return &UserRepository{FirebaseApp: firebase}
+func NewUserRepository(db *db.Client) *UserRepository {
+	return &UserRepository{
+		firebaseDB: db,
+	}
 }
 
 func (c *UserRepository) CreateNewUser(user model.User) (string, error) {
 	ctx := context.Background()
 
-	client, err := c.FirebaseApp.Database(ctx)
-	if err != nil {
-		return "", fmt.Errorf("failed to get Realtime Database client: %v", err)
-	}
-
-	ref, err := client.NewRef("users").Push(ctx, user)
+	ref, err := c.firebaseDB.NewRef("users").Push(ctx, user)
 	userId := ref.Key
 
 	if err != nil {
@@ -37,15 +34,10 @@ func (c *UserRepository) CreateNewUser(user model.User) (string, error) {
 func (c *UserRepository) GetUserDetailsFromEmail(email string) (*model.User, error) {
 	ctx := context.Background()
 
-	client, err := c.FirebaseApp.Database(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get Realtime Database client: %v", err)
-	}
-
-	ref := client.NewRef("users")
+	ref := c.firebaseDB.NewRef("users")
 	var users map[string]model.User
 
-	err = ref.OrderByChild("email").EqualTo(email).LimitToFirst(1).Get(ctx, &users)
+	err := ref.OrderByChild("email").EqualTo(email).LimitToFirst(1).Get(ctx, &users)
 	if err != nil {
 		return nil, fmt.Errorf("error querying database: %v", err)
 	}
@@ -61,13 +53,8 @@ func (c *UserRepository) GetUserDetailsFromEmail(email string) (*model.User, err
 func (c *UserRepository) GetUserById(userId string) (*model.User, error) {
 	ctx := context.Background()
 
-	client, err := c.FirebaseApp.Database(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get Realtime Database client: %v", err)
-	}
-
 	var user *model.User
-	err = client.NewRef("users").Child(userId).Get(ctx, &user)
+	err := c.firebaseDB.NewRef("users").Child(userId).Get(ctx, &user)
 	if err != nil {
 		return nil, fmt.Errorf("error querying database: %v", err)
 	}
@@ -77,16 +64,11 @@ func (c *UserRepository) GetUserById(userId string) (*model.User, error) {
 func (c *UserRepository) UpdateUserXP(userId string, xp int) error {
 	ctx := context.Background()
 
-	client, err := c.FirebaseApp.Database(ctx)
-	if err != nil {
-		return fmt.Errorf("failed to get Realtime Database client: %v", err)
-	}
-
 	var updates = make(map[string]interface{})
-	updates["xp"] = map[string]interface{}{".sv": "increment", "value": xp}
+	updates["XP"] = map[string]interface{}{".sv": map[string]interface{}{"increment": xp}}
 
 	if len(updates) > 0 {
-		if err := client.NewRef("users").Child(userId).Update(ctx, updates); err != nil {
+		if err := c.firebaseDB.NewRef("users").Child(userId).Update(ctx, updates); err != nil {
 			return err
 		}
 	}

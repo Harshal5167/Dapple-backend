@@ -3,29 +3,24 @@ package repository
 import (
 	"context"
 
-	firebase "firebase.google.com/go/v4"
+	"firebase.google.com/go/v4/db"
 	"github.com/Harshal5167/Dapple-backend/internal/model"
 )
 
 type LessonRepository struct {
-	firebaseApp *firebase.App
+	firebaseDB *db.Client
 }
 
-func NewLessonRepository(firebaseApp *firebase.App) *LessonRepository {
+func NewLessonRepository(db *db.Client) *LessonRepository {
 	return &LessonRepository{
-		firebaseApp: firebaseApp,
+		firebaseDB: db,
 	}
 }
 
 func (r *LessonRepository) AddLesson(lesson model.Lesson) (string, error) {
 	ctx := context.Background()
 
-	client, err := r.firebaseApp.Database(ctx)
-	if err != nil {
-		return "", err
-	}
-
-	ref, err := client.NewRef("lessons").Push(ctx, lesson)
+	ref, err := r.firebaseDB.NewRef("lessons").Push(ctx, lesson)
 	if err != nil {
 		return "", err
 	}
@@ -36,13 +31,8 @@ func (r *LessonRepository) AddLesson(lesson model.Lesson) (string, error) {
 func (r *LessonRepository) GetLessonById(lessonId string) (*model.Lesson, error) {
 	ctx := context.Background()
 
-	client, err := r.firebaseApp.Database(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	var lesson model.Lesson
-	if err := client.NewRef("lessons/"+lessonId).Get(ctx, &lesson); err != nil {
+	if err := r.firebaseDB.NewRef("lessons/"+lessonId).Get(ctx, &lesson); err != nil {
 		return nil, err
 	}
 
