@@ -73,3 +73,22 @@ func (c *UserRepository) GetUserById(userId string) (*model.User, error) {
 	}
 	return user, nil
 }
+
+func (c *UserRepository) UpdateUserXP(userId string, xp int) error {
+	ctx := context.Background()
+
+	client, err := c.FirebaseApp.Database(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to get Realtime Database client: %v", err)
+	}
+
+	var updates = make(map[string]interface{})
+	updates["xp"] = map[string]interface{}{".sv": "increment", "value": xp}
+
+	if len(updates) > 0 {
+		if err := client.NewRef("users").Child(userId).Update(ctx, updates); err != nil {
+			return err
+		}
+	}
+	return nil
+}

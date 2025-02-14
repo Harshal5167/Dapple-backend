@@ -23,7 +23,7 @@ type SectionRepository interface {
 	GetQuestionsAndLessons(sectionId string) ([]string, []string, error)
 	GetNoOfItems(sectionId string, itemType string) (int, error)
 	StoreSectionProgress(userId string, sectionId string) (*model.SectionProgress, error)
-	UpdateSectionProgress(userId string, sectionId string, xp int) (int64, error)
+	UpdateSectionProgress(userId string, sectionId string, xp int) (int, int, error)
 	GetNextSectionId(sectionId string) (string, error)
 }
 
@@ -48,4 +48,5 @@ type UserRepository interface {
 	CreateNewUser(user model.User) (string, error)
 	GetUserDetailsFromEmail(email string) (*model.User, error)
 	GetUserById(userId string) (*model.User, error)
+	UpdateUserXP(userId string, xp int) error
 }

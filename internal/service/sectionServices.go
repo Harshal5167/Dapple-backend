@@ -167,7 +167,7 @@ func (s *SectionService) UpdateSectionProgress(userId string, lessonId string) e
 	sectionId := lesson.SectionId
 	xp := lesson.XP
 
-	_, err = s.sectionRepo.UpdateSectionProgress(userId, sectionId, xp)
+	_, _, err = s.sectionRepo.UpdateSectionProgress(userId, sectionId, xp)
 	if err != nil {
 		return err
 	}

@@ -148,20 +148,31 @@ func (c *SectionRepository) StoreSectionProgress(userId string, sectionId string
 	}, nil
 }
 
-func (c *SectionRepository) UpdateSectionProgress(userId string, sectionId string, xp int) (int64, error) {
+func (c *SectionRepository) UpdateSectionProgress(userId string, sectionId string, xp int) (int, int, error) {
 	ctx := context.Background()
 	key := fmt.Sprintf("user:%s:section:%s", userId, sectionId)
 
-	progress, err := c.rdb.HIncrBy(ctx, key, "progress", 1).Result()
+	pipe := c.rdb.TxPipeline()
+
+	progressCmd := pipe.HIncrBy(ctx, key, "progress", 1)
+	xpCmd := pipe.HIncrBy(ctx, key, "xp", int64(xp))
+
+	_, err := pipe.Exec(ctx)
 	if err != nil {
-		return 0, err
+		return 0, 0, err
 	}
 
-	err = c.rdb.HIncrBy(ctx, key, "xp", int64(xp)).Err()
+	progress, err := progressCmd.Result()
 	if err != nil {
-		return 0, err
+		return 0, 0, err
 	}
-	return progress, nil
+
+	xpGained, err := xpCmd.Result()
+	if err != nil {
+		return 0, 0, err
+	}
+
+	return int(progress), int(xpGained), nil
 }
 
 func (c *SectionRepository) GetNextSectionId(sectionId string) (string, error) {

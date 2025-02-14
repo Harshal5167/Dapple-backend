@@ -14,18 +14,21 @@ type UserCourseService struct {
 	levelRepo      interfaces.LevelRepository
 	geminiService  interfaces.GeminiService
 	sectionRepo    interfaces.SectionRepository
+	userRepo       interfaces.UserRepository
 }
 
 func NewUserCourseService(
 	userCourseRepo interfaces.UserCourseRepository,
 	levelRepo interfaces.LevelRepository,
 	geminiService interfaces.GeminiService,
-	sectionRepo interfaces.SectionRepository) interfaces.UserCourseService {
+	sectionRepo interfaces.SectionRepository,
+	userRepo interfaces.UserRepository) interfaces.UserCourseService {
 	return &UserCourseService{
 		userCourseRepo: userCourseRepo,
 		levelRepo:      levelRepo,
 		geminiService:  geminiService,
 		sectionRepo:    sectionRepo,
+		userRepo:       userRepo,
 	}
 }
 
@@ -80,7 +83,7 @@ func (s *UserCourseService) GetUserCourse(userId string) (*response.UserCourseRe
 	}, nil
 }
 
-func (s *UserCourseService) UpdateUserProgress(userId string, sectionId string) error {
+func (s *UserCourseService) UpdateUserProgress(userId string, sectionId string, xp int) error {
 	nextSectionId, err := s.sectionRepo.GetNextSectionId(sectionId)
 	if err != nil {
 		return err
@@ -94,5 +97,11 @@ func (s *UserCourseService) UpdateUserProgress(userId string, sectionId string) 
 			return err
 		}
 	}
+
+	err = s.userRepo.UpdateUserXP(userId, xp)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

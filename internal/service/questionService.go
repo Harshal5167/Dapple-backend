@@ -79,13 +79,13 @@ func (s *QuestionService) EvaluateObjectiveAnswer(userId string, req *request.Ev
 	if req.SelectedOption == question.CorrectOption {
 		xp = question.XP
 	}
-	progress, err := s.sectionRepo.UpdateSectionProgress(userId, question.SectionId, xp)
+	progress,_, err := s.sectionRepo.UpdateSectionProgress(userId, question.SectionId, xp)
 	if err != nil {
 		return nil, err
 	}
 
 	if int(progress) >= MaxNoOfLessons+MaxNoOfQuestions {
-		err = s.UserCourseService.UpdateUserProgress(userId, question.SectionId)
+		err = s.UserCourseService.UpdateUserProgress(userId, question.SectionId, xp)
 		if err != nil {
 			return nil, err
 		}
@@ -114,13 +114,13 @@ func (s *QuestionService) EvaluateSubjectiveAnswer(userId string, req *request.E
 		return nil, err
 	}
 
-	progress, err := s.sectionRepo.UpdateSectionProgress(userId, question.SectionId, userAnswerEvaluation.XPGained)
+	progress,xp, err := s.sectionRepo.UpdateSectionProgress(userId, question.SectionId, userAnswerEvaluation.XPGained)
 	if err != nil {
 		return nil, err
 	}
 
 	if int(progress) >= MaxNoOfLessons+MaxNoOfQuestions {
-		err = s.UserCourseService.UpdateUserProgress(userId, question.SectionId)
+		err = s.UserCourseService.UpdateUserProgress(userId, question.SectionId, xp)
 		if err != nil {
 			return nil, err
 		}
