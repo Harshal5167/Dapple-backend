@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"firebase.google.com/go/v4/db"
 	"github.com/Harshal5167/Dapple-backend/internal/model"
@@ -93,34 +94,33 @@ func (c *SectionRepository) GetQuestionsAndLessons(sectionId string) ([]string, 
 }
 
 func (c *SectionRepository) StoreSectionProgress(userId string, sectionId string) (*model.SectionProgress, error) {
-	ctx := context.Background()
-	key := fmt.Sprintf("user:%s:section:%s", userId, sectionId)
-
-	sectionProgress := &model.SectionProgress{}
-	err := c.rdb.HGetAll(ctx, key).Scan(sectionProgress)
-	if err != nil {
-		return nil, err
-	}
-
-	if sectionProgress.Progress != 0 {
-		return sectionProgress, nil
-	}
-
-	pipe := c.rdb.TxPipeline()
-
-	pipe.HSet(ctx, key, []string{
-		"progress", "0",
-		"xp", "0",
-	}).Err()
-	pipe.Expire(ctx, key, 86400)
-	_, err = pipe.Exec(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return &model.SectionProgress{
-		Progress: 0,
-		XP:       0,
-	}, nil
+    ctx := context.Background()
+    key := fmt.Sprintf("user:%s:section:%s", userId, sectionId)
+    
+    val, err := c.rdb.Exists(ctx, key).Result()
+    if err != nil {
+        return nil, err
+    }
+    if val != 0 {
+        sectionProgress := &model.SectionProgress{}
+        err = c.rdb.HGetAll(ctx, key).Scan(sectionProgress)
+        if err != nil {
+            return nil, err
+        }
+        return sectionProgress, nil
+    }
+    
+    pipe := c.rdb.Pipeline()
+    pipe.HSet(ctx, key, "progress", "0", "xp", "0")
+    pipe.Expire(ctx, key, 86400*time.Second)
+    _, err = pipe.Exec(ctx)
+    if err != nil {
+        return nil, err
+    }
+    return &model.SectionProgress{
+        Progress: 0, 
+        XP:       0, 
+    }, nil
 }
 
 func (c *SectionRepository) UpdateSectionProgress(userId string, sectionId string, xp int) (int, int, error) {
