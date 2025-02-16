@@ -3,7 +3,6 @@ package service
 import (
 	"fmt"
 
-	"github.com/Harshal5167/Dapple-backend/data"
 	"github.com/Harshal5167/Dapple-backend/internal/dto/response"
 	"github.com/Harshal5167/Dapple-backend/internal/interfaces"
 	"github.com/Harshal5167/Dapple-backend/internal/model"
@@ -67,18 +66,30 @@ func (s *UserCourseService) GetUserCourse(userId string) (*response.UserCourseRe
 		return nil, err
 	}
 
-	var levels []model.Level
+	var levels []response.Level
 	for _, levelId := range userCourse.Levels {
 		level, err := s.levelRepo.GetLevelById(levelId)
 		if err != nil {
 			return nil, err
 		}
-		levels = append(levels, *level)
+		var Level = response.Level{
+			Name:        level.Name,
+			Description: level.Description,
+			ImageUrl:    level.ImageUrl,
+			Sections:    []response.Section{},
+		}
+		for _, sectionId := range level.Sections {
+			section, err := s.sectionRepo.GetSectionById(sectionId)
+			if err != nil {
+				return nil, err
+			}
+			Level.Sections = append(Level.Sections, *section)
+		}
+		levels = append(levels, Level)
 	}
 
 	return &response.UserCourseResponse{
 		Levels:      levels,
-		SectionData: data.SectionData,
 		UserProgess: userCourse.UserProgress,
 	}, nil
 }

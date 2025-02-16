@@ -1,11 +1,17 @@
 package handler
 
 import (
+	// "bytes"
+	// "io"
+	// "slices"
+
 	"github.com/Harshal5167/Dapple-backend/internal/dto/request"
 	"github.com/Harshal5167/Dapple-backend/internal/interfaces"
 	"github.com/Harshal5167/Dapple-backend/internal/model"
 	"github.com/gofiber/fiber/v2"
 )
+
+var AllowedFileExtensions = []string{"audio/mp3", "audio/wav", "audio/ogg"}
 
 type QuestionHandler struct {
 	questionService interfaces.QuestionService
@@ -138,3 +144,56 @@ func (h *QuestionHandler) GetHint(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(resp)
 }
+
+// func (h *QuestionHandler) EvaluateVoiceAnswer(c *fiber.Ctx) error {
+// 	userId, ok := c.Locals("userId").(string)
+// 	if !ok {
+// 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+// 			"error": "Invalid userId",
+// 		})
+// 	}
+
+// 	var req *request.EvaluateVoiceAnswerReq
+// 	if err := c.BodyParser(&req); err != nil {
+// 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+// 			"error": "Invalid request body",
+// 		})
+// 	}
+
+// 	file, err := c.FormFile("file")
+// 	if err != nil {
+// 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+// 			"error": "Invalid file",
+// 		})
+// 	}
+
+// 	var buf = &bytes.Buffer{}
+// 	fileReader, err := file.Open()
+// 	if err != nil {
+// 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+// 			"error": "Failed to read file",
+// 		})
+// 	}
+// 	defer fileReader.Close()
+
+// 	if _, err := io.Copy(buf, fileReader); err != nil {
+// 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+// 			"error": "Failed to read file",
+// 		})
+// 	}
+
+// 	if req.QuestionId == "" || !(slices.Contains(AllowedFileExtensions, file.Header.Get("Content-Type"))) {
+// 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+// 			"error": "Invalid Fields",
+// 		})
+// 	}
+
+// 	resp, err := h.questionService.EvaluateVoiceAnswer(userId, c, req, buf)
+// 	if err != nil {
+// 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+// 			"error": err.Error(),
+// 		})
+// 	}
+
+// 	return c.Status(fiber.StatusOK).JSON(resp)
+// }

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"firebase.google.com/go/v4/db"
+	"github.com/Harshal5167/Dapple-backend/internal/dto/response"
 	"github.com/Harshal5167/Dapple-backend/internal/model"
 	"github.com/redis/go-redis/v9"
 )
@@ -94,33 +95,33 @@ func (c *SectionRepository) GetQuestionsAndLessons(sectionId string) ([]string, 
 }
 
 func (c *SectionRepository) StoreSectionProgress(userId string, sectionId string) (*model.SectionProgress, error) {
-    ctx := context.Background()
-    key := fmt.Sprintf("user:%s:section:%s", userId, sectionId)
-    
-    val, err := c.rdb.Exists(ctx, key).Result()
-    if err != nil {
-        return nil, err
-    }
-    if val != 0 {
-        sectionProgress := &model.SectionProgress{}
-        err = c.rdb.HGetAll(ctx, key).Scan(sectionProgress)
-        if err != nil {
-            return nil, err
-        }
-        return sectionProgress, nil
-    }
-    
-    pipe := c.rdb.Pipeline()
-    pipe.HSet(ctx, key, "progress", "0", "xp", "0")
-    pipe.Expire(ctx, key, 86400*time.Second)
-    _, err = pipe.Exec(ctx)
-    if err != nil {
-        return nil, err
-    }
-    return &model.SectionProgress{
-        Progress: 0, 
-        XP:       0, 
-    }, nil
+	ctx := context.Background()
+	key := fmt.Sprintf("user:%s:section:%s", userId, sectionId)
+
+	val, err := c.rdb.Exists(ctx, key).Result()
+	if err != nil {
+		return nil, err
+	}
+	if val != 0 {
+		sectionProgress := &model.SectionProgress{}
+		err = c.rdb.HGetAll(ctx, key).Scan(sectionProgress)
+		if err != nil {
+			return nil, err
+		}
+		return sectionProgress, nil
+	}
+
+	pipe := c.rdb.Pipeline()
+	pipe.HSet(ctx, key, "progress", "0", "xp", "0")
+	pipe.Expire(ctx, key, 86400*time.Second)
+	_, err = pipe.Exec(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &model.SectionProgress{
+		Progress: 0,
+		XP:       0,
+	}, nil
 }
 
 func (c *SectionRepository) UpdateSectionProgress(userId string, sectionId string, xp int) (int, int, error) {
@@ -159,4 +160,28 @@ func (c *SectionRepository) GetNextSectionId(sectionId string) (string, error) {
 	}
 
 	return nextSectionId, nil
+}
+
+func (c *SectionRepository) GetSectionById(sectionId string) (*response.Section, error) {
+	ctx := context.Background()
+	var section = &response.Section{}
+	err := c.firebaseDB.NewRef("sections").Child(sectionId).Get(ctx, section)
+	if err != nil {
+		return nil, err
+	}
+	section.SectionId = sectionId
+	return section, nil
+}
+
+func (c *SectionRepository) DeleteSectionProgress(userId string, sectionId string) error {
+	ctx := context.Background()
+	key := fmt.Sprintf("user:%s:section:%s", userId, sectionId)
+
+	pipe := c.rdb.Pipeline()
+	pipe.Del(ctx, key)
+	_, err := pipe.Exec(ctx)
+	if err != nil {
+		return err
+	}
+	return nil
 }

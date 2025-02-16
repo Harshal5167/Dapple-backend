@@ -24,3 +24,7 @@ type EvaluateObjectiveAnswerReq struct {
 	QuestionId     string `json:"questionId"`
 	SelectedOption int    `json:"selectedOption"`
 }
+
+type EvaluateVoiceAnswerReq struct {
+	QuestionId string `json:"questionId"`
+}

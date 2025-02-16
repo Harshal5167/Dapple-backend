@@ -7,6 +7,7 @@ import (
 	"github.com/Harshal5167/Dapple-backend/internal/dto/response"
 	"github.com/Harshal5167/Dapple-backend/internal/interfaces"
 	"github.com/Harshal5167/Dapple-backend/internal/model"
+	// "github.com/gofiber/fiber/v2"
 )
 
 var MaxNoOfQuestions int = 4
@@ -76,23 +77,27 @@ func (s *QuestionService) EvaluateObjectiveAnswer(userId string, req *request.Ev
 	}
 
 	xp := 0
-	if req.SelectedOption == question.CorrectOption {
+	if req.SelectedOption == (question.CorrectOption-1) {
 		xp = question.XP
 	}
-	progress, _, err := s.sectionRepo.UpdateSectionProgress(userId, question.SectionId, xp)
+	progress, XP, err := s.sectionRepo.UpdateSectionProgress(userId, question.SectionId, xp)
 	if err != nil {
 		return nil, err
 	}
 
 	if int(progress) >= MaxNoOfLessons+MaxNoOfQuestions {
-		err = s.UserCourseService.UpdateUserProgress(userId, question.SectionId, xp)
+		err = s.UserCourseService.UpdateUserProgress(userId, question.SectionId, XP)
+		if err != nil {
+			return nil, err
+		}
+		err = s.sectionRepo.DeleteSectionProgress(userId, question.SectionId)
 		if err != nil {
 			return nil, err
 		}
 	}
 
 	return &response.EvaluateObjectiveAnswerResponse{
-		CorrectOption: question.CorrectOption,
+		CorrectOption: question.CorrectOption-1,
 		Explanation:   question.Explanation,
 		XP:            xp,
 	}, nil
@@ -124,6 +129,10 @@ func (s *QuestionService) EvaluateSubjectiveAnswer(userId string, req *request.E
 		if err != nil {
 			return nil, err
 		}
+		err = s.sectionRepo.DeleteSectionProgress(userId, question.SectionId)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return &response.EvaluateSubjectiveAnswerResponse{
@@ -144,3 +153,35 @@ func (s *QuestionService) GetHint(questionId string) (*response.GetHintResponse,
 		Hint: hint,
 	}, nil
 }
+
+// func (s *QuestionService) EvaluateVoiceAnswer(userId string, c *fiber.Ctx, req *request.EvaluateVoiceAnswerReq, buf []byte) (*response.EvaluateVoiceAnswerResponse, error) {
+// 	evaluation, err:=
+
+// 	question, err := s.questionRepo.GetQuestionById(req.QuestionId)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	userAnswerEvaluation, err := s.geminiService.EvaluateVoiceAnswer(user, question, buf)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	progress, xp, err := s.sectionRepo.UpdateSectionProgress(userId, question.SectionId, userAnswerEvaluation.XPGained)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	if int(progress) >= MaxNoOfLessons+MaxNoOfQuestions {
+// 		err = s.UserCourseService.UpdateUserProgress(userId, question.SectionId, xp)
+// 		if err != nil {
+// 			return nil, err
+// 		}
+// 	}
+
+// 	return &response.EvaluateVoiceAnswerResponse{
+// 		Evaluation: userAnswerEvaluation.Evaluation,
+// 		BestAnswer: question.BestAnswer,
+// 		XP:         userAnswerEvaluation.XPGained,
+// 	}, nil
+// }

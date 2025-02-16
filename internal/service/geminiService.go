@@ -58,6 +58,8 @@ func (s *geminiService) GenerateUserCourse(user model.User, levelDetails []map[s
 		]
 	}
 	Note that you have to select exactly 1 levels so the selectedLevels should contains 1 levelIds.
+	Don't use backticks while giving the response.
+	
 	`
 
 	levelDetailsString := utils.BuildStringForLevels(levelDetails)
@@ -141,17 +143,20 @@ func (s *geminiService) EvaluateUserAnswer(user *model.User, question *model.Que
 		{
 			"Evaluation":[
 				{
-					"title": "key concepts to focus while answering",
+					"title": "Key Concepts to Focus",
 					"content": "Evaluate how well the user's response aligns with social norms, emotional intelligence, and effective communication strategies. Focus on aspects like active listening, conversational flow, confidence, and non-verbal cues. Ensure the user understands how to engage appropriately in different social settings based on their specific challenges. this field should not contain more than 25 words"
 				},
 				{
-					"title": "key points to answer better",
+					"title": "Key Points to Answer Better",
 					"content": "Provide actionable improvements tailored to the user's social struggles. Offer guidance on structuring responses more effectively, using open-ended engagement, showing empathy, and maintaining clarity. Highlight specific techniques such as mirroring, tone modulation, or asking follow-up questions to improve interaction quality. Compare the response with the best answer and suggest personalized tweaks for better alignment. this field should not contain more than 25 words"
 				}
 			],
-			"xpGained": "based on the user answer give him a xp which you think he should get out of the total xp of that question. also the xp should be in multiple of 10 like 10,20,30,... and should not exceed the total xp of the question and not 0." (int)
+			"xpGained": "based on the user answer give him a xp which you think he should get out of the total xp of that question. also the xp should be in multiple of 10 like 10,20,30,... give the xp generously and dont be stingy in giving it and should not exceed the total xp of the question and not 0." (int)
 		}
-		Note that you have to write the two things very nicely in a good way as per the user profile and as per the user answer. you can always refer to the best answer.`
+		Note that you have to write the two things very nicely in a good way as per the user profile and as per the user answer. you can always refer to the best answer.
+		THE CONTENT FIELD SHOULD NOT CONTAIN ANY SPECIAL CHARACTERS LIKE SINGLE OR DOUBLE QUOTES OR NUMBERS IT SHOULD BE PLAIN TEXT NOT IN README FORM NEITHER WITH \N AND \T TYPE THINGS. REMEMBER THIS WHILE GENERATING THE RESPONSE.
+		REMEMBER NO DOUBLE QUOTES OR SINGLE QUOTES OR NUMBERS IN THE CONTENT FIELD.
+		`
 
 	prompt := fmt.Sprintf(
 		promptTemplate,

@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/Harshal5167/Dapple-backend/internal/dto/response"
 	"github.com/Harshal5167/Dapple-backend/internal/dto/request"
@@ -80,17 +79,14 @@ func (c *AuthService) Register(reqBody *request.RegisterRequest) (*response.Auth
 		Gender:                  reqBody.Gender,
 		XP:                      0,
 	}
-	fmt.Println(newUser)
 	userId, err := c.userRepo.CreateNewUser(newUser)
 	if err != nil {
 		return nil, err
 	}
 
-	fmt.Println(newUser)
 	if err = c.userCourseService.TailorUserCourse(userId, newUser); err != nil {
 		return nil, err
 	}
-	fmt.Println(newUser)
 
 	token, err := utils.GenerateJWTToken(model.User{
 		UserId: userId,

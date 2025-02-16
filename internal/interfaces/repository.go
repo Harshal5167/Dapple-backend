@@ -25,6 +25,8 @@ type SectionRepository interface {
 	StoreSectionProgress(userId string, sectionId string) (*model.SectionProgress, error)
 	UpdateSectionProgress(userId string, sectionId string, xp int) (int, int, error)
 	GetNextSectionId(sectionId string) (string, error)
+	GetSectionById(sectionId string) (*response.Section, error)
+	DeleteSectionProgress(userId string, sectionId string) error
 }
 
 type QuestionRepository interface {

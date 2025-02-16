@@ -24,4 +24,5 @@ func (r *QuestionRoute) QuestionRoutes(app *fiber.App) {
 	evaluateAnswer := question.Group("/evaluate-answer", middleware.IsAuth)
 	evaluateAnswer.Post("/objective", r.questionHandler.EvaluateObjectiveAnswer)
 	evaluateAnswer.Post("/subjective", r.questionHandler.EvaluateSubjectiveAnswer)
+	// evaluateAnswer.Post("/voice", r.questionHandler.EvaluateVoiceAnswer)
 }

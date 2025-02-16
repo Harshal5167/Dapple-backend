@@ -22,5 +22,10 @@ func (c *AuthRepository) VerifyFirebaseToken(token string) (bool, string, error)
 		return false, "", err
 	}
 
-	return true, verifiedToken.Claims["email"].(string), nil
+	email, ok := verifiedToken.Claims["email"].(string)
+	if !ok {
+		return false, "", nil
+	}
+
+	return true, email, nil
 }

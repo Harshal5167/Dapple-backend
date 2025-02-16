@@ -65,13 +65,34 @@ func (s *SectionService) GetSectionData(userId string, sectionId string) (*respo
 		if err != nil {
 			return nil, err
 		}
-		questionList = append(questionList, map[string]interface{}{
-			"questionId":   questionId,
-			"type":         question.Type,
-			"questionText": question.QuestionText,
-			"imageUrl":     question.ImageUrl,
-			"XP":           question.XP,
-		})
+		if question.Type == model.Objective {
+			questionList = append(questionList, map[string]interface{}{
+				"questionId": questionId,
+				"type":       question.Type,
+				"question":   question.QuestionText,
+				"options":    question.Options,
+				"xp":         question.XP,
+				"imageUrl": func() interface{} {
+					if question.ImageUrl != "" {
+						return question.ImageUrl
+					}
+					return nil
+				}(),
+			})
+		} else if question.Type == model.Subjective {
+			questionList = append(questionList, map[string]interface{}{
+				"questionId": questionId,
+				"type":       question.Type,
+				"question":   question.QuestionText,
+				"xp":         question.XP,
+				"imageUrl": func() interface{} {
+					if question.ImageUrl != "" {
+						return question.ImageUrl
+					}
+					return nil
+				}(),
+			})
+		}
 	}
 
 	var lessonList []map[string]interface{}
@@ -84,8 +105,13 @@ func (s *SectionService) GetSectionData(userId string, sectionId string) (*respo
 			"lessonId": lessonId,
 			"title":    lesson.Title,
 			"content":  lesson.Content,
-			"imageUrl": lesson.ImageUrl,
-			"XP":       lesson.XP,
+			"imageUrl": func() interface{} {
+				if lesson.ImageUrl != "" {
+					return lesson.ImageUrl
+				}
+				return nil
+			}(),
+			"xp": lesson.XP,
 		})
 	}
 
