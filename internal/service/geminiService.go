@@ -256,6 +256,7 @@ func (s *geminiService) FormatVoiceEvaluationResponse(obtainedVoiceEvaluation *r
 	THE CONTENT FIELD SHOULD NOT CONTAIN ANY SPECIAL CHARACTERS LIKE SINGLE OR DOUBLE QUOTES OR NUMBERS IT SHOULD BE PLAIN TEXT NOT IN README FORM NEITHER WITH \N AND \T TYPE THINGS. REMEMBER THIS WHILE GENERATING THE RESPONSE.
 	REMEMBER NO DOUBLE QUOTES OR SINGLE QUOTES OR NUMBERS IN THE CONTENT FIELD.
 	Give the response like json format with the response wrapped in json and backticks (just like standard json format).
+	The response should be in valid json format look closely for closing brackets.
 	`
 
 	obtainedEmotions := utils.BuildStringForEmotions(obtainedVoiceEvaluation.Top3Emotions)

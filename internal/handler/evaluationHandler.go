@@ -3,8 +3,9 @@ package handler
 import (
 	"bytes"
 	"fmt"
-	// "fmt"
 	"io"
+	"slices"
+
 	// "slices"
 
 	"github.com/Harshal5167/Dapple-backend/config"
@@ -111,7 +112,7 @@ func (h *EvaluationHandler) EvaluateVoiceAnswer(c *fiber.Ctx) error {
 	}
 
 	fmt.Println(file.Header.Get("Content-Type"))
-	if req.QuestionId == "" || int(file.Size) > config.MaxFileSize {
+	if req.QuestionId == "" || !(slices.Contains(config.AllowedFileExtensions, file.Header.Get("Content-Type"))) || int(file.Size) > config.MaxFileSize {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Invalid Fields",
 		})
@@ -131,14 +132,6 @@ func (h *EvaluationHandler) EvaluateVoiceAnswer(c *fiber.Ctx) error {
 			"error": "Failed to read file",
 		})
 	}
-
-	// resp, err := clients.VoiceEvaluation(buf.Bytes())
-	// if err != nil {
-	// 	return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-	// 		"error": err.Error(),
-	// 	})
-	// }
-	// return c.Status(fiber.StatusOK).JSON(resp)
 
 	resp, err := h.EvaluationService.EvaluateVoiceAnswer(userId, req, buf.Bytes())
 	if err != nil {

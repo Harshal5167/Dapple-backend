@@ -12,7 +12,7 @@ func BuildStringForEmotions(emotions []model.Emotion) string {
 
 	builder.WriteString("Emotions:\n")
 
-	for i, emotion := range emotions {
+	for i, emotion := range emotions {	
 		builder.WriteString(fmt.Sprintf(
 			"%d. Emotion: %s\n   Confidence: %.2f%%\n\n",
 			i+1,

@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"time"
 
 	"firebase.google.com/go/v4/db"
@@ -112,7 +113,7 @@ func (c *SectionRepository) StoreSectionProgress(userId string, sectionId string
 	}
 
 	pipe := c.rdb.Pipeline()
-	pipe.HSet(ctx, key, "progress", "0", "xp", "0")
+	pipe.HSet(ctx, key, "progress", "0", "xp", "0", "timestamp", fmt.Sprintf("%d", time.Now().Unix()))
 	pipe.Expire(ctx, key, 86400*time.Second)
 	_, err = pipe.Exec(ctx)
 	if err != nil {
@@ -184,4 +185,20 @@ func (c *SectionRepository) DeleteSectionProgress(userId string, sectionId strin
 		return err
 	}
 	return nil
+}
+
+func (c *SectionRepository) GetTimeStamp(userId string, sectionId string) (int64, error) {
+	ctx := context.Background()
+	key := fmt.Sprintf("user:%s:section:%s", userId, sectionId)
+
+	timestamp, err := c.rdb.HGet(ctx, key, "timestamp").Result()
+	if err != nil {
+		return 0, err
+	}
+
+	timestampInt, err := strconv.Atoi(timestamp)
+	if err != nil {
+		return 0, err
+	}
+	return int64(timestampInt), nil
 }

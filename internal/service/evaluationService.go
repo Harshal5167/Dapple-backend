@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/Harshal5167/Dapple-backend/config"
 	"github.com/Harshal5167/Dapple-backend/internal/clients"
@@ -77,21 +78,39 @@ func (s *EvaluationService) EvaluateVoiceAnswer(userId string, req *request.Eval
 		return nil, err
 	}
 
-	progress, xp, err := s.sectionRepo.UpdateSectionProgress(userId, question.SectionId, xpGained)
+	progress, totalXP, err := s.sectionRepo.UpdateSectionProgress(userId, question.SectionId, xpGained)
 	if err != nil {
 		return nil, err
 	}
 
+	var totalTimeTaken int64 = 0
 	if int(progress) >= config.MaxNoOfLessons+config.MaxNoOfQuestions {
-		err = s.userCourseService.UpdateUserProgress(userId, question.SectionId, xp)
+		err = s.userCourseService.UpdateUserProgress(userId, question.SectionId, totalXP)
+		if err != nil {
+			return nil, err
+		}
+		timestamp, err := s.sectionRepo.GetTimeStamp(userId, question.SectionId)
+		if err != nil {
+			return nil, err
+		}
+		totalTimeTaken = time.Now().Unix() - timestamp
+		err = s.sectionRepo.DeleteSectionProgress(userId, question.SectionId)
 		if err != nil {
 			return nil, err
 		}
 	}
 
+	if totalTimeTaken == 0 || int(progress) < config.MaxNoOfLessons+config.MaxNoOfQuestions {
+		return &response.EvaluateVoiceAnswerResponse{
+			Evaluation: formattedResponse.Evaluation,
+			XP:         xpGained,
+		}, nil
+	}
 	return &response.EvaluateVoiceAnswerResponse{
-		Evaluation: formattedResponse.Evaluation,
-		XP:         xpGained,
+		Evaluation:     formattedResponse.Evaluation,
+		XP:             xpGained,
+		TotalXP:        totalXP,
+		TotalTimeTaken: int64(totalTimeTaken),
 	}, nil
 }
 
@@ -105,26 +124,41 @@ func (s *EvaluationService) EvaluateObjectiveAnswer(userId string, req *request.
 	if req.SelectedOption == (question.CorrectOption - 1) {
 		xp = question.XP
 	}
-	progress, XP, err := s.sectionRepo.UpdateSectionProgress(userId, question.SectionId, xp)
+	progress, totalXP, err := s.sectionRepo.UpdateSectionProgress(userId, question.SectionId, xp)
 	if err != nil {
 		return nil, err
 	}
 
+	var totalTimeTaken int64 = 0
 	if int(progress) >= config.MaxNoOfLessons+config.MaxNoOfQuestions {
-		err = s.userCourseService.UpdateUserProgress(userId, question.SectionId, XP)
+		err = s.userCourseService.UpdateUserProgress(userId, question.SectionId, totalXP)
 		if err != nil {
 			return nil, err
 		}
+		timestamp, err := s.sectionRepo.GetTimeStamp(userId, question.SectionId)
+		if err != nil {
+			return nil, err
+		}
+		totalTimeTaken = time.Now().Unix() - timestamp
 		err = s.sectionRepo.DeleteSectionProgress(userId, question.SectionId)
 		if err != nil {
 			return nil, err
 		}
 	}
 
+	if totalTimeTaken == 0 || int(progress) < config.MaxNoOfLessons+config.MaxNoOfQuestions {
+		return &response.EvaluateObjectiveAnswerResponse{
+			CorrectOption: question.CorrectOption - 1,
+			Explanation:   question.Explanation,
+			XP:            xp,
+		}, nil
+	}
 	return &response.EvaluateObjectiveAnswerResponse{
-		CorrectOption: question.CorrectOption - 1,
-		Explanation:   question.Explanation,
-		XP:            xp,
+		CorrectOption:  question.CorrectOption - 1,
+		Explanation:    question.Explanation,
+		XP:             xp,
+		TotalXP:        totalXP,
+		TotalTimeTaken: int64(totalTimeTaken),
 	}, nil
 }
 
@@ -145,26 +179,42 @@ func (s *EvaluationService) EvaluateSubjectiveAnswer(userId string, req *request
 		return nil, err
 	}
 
-	progress, xp, err := s.sectionRepo.UpdateSectionProgress(userId, question.SectionId, userAnswerEvaluation.XPGained)
+	progress, totalXP, err := s.sectionRepo.UpdateSectionProgress(userId, question.SectionId, userAnswerEvaluation.XPGained)
 	if err != nil {
 		return nil, err
 	}
 
+	var totalTimeTaken int64 = 0
 	if int(progress) >= config.MaxNoOfLessons+config.MaxNoOfQuestions {
-		err = s.userCourseService.UpdateUserProgress(userId, question.SectionId, xp)
+		err = s.userCourseService.UpdateUserProgress(userId, question.SectionId, totalXP)
 		if err != nil {
 			return nil, err
 		}
+		timestamp, err := s.sectionRepo.GetTimeStamp(userId, question.SectionId)
+		if err != nil {
+			return nil, err
+		}
+		totalTimeTaken = time.Now().Unix() - timestamp
 		err = s.sectionRepo.DeleteSectionProgress(userId, question.SectionId)
 		if err != nil {
 			return nil, err
 		}
 	}
 
+	if totalTimeTaken == 0 || int(progress) < config.MaxNoOfLessons+config.MaxNoOfQuestions {
+		return &response.EvaluateSubjectiveAnswerResponse{
+			Evaluation: userAnswerEvaluation.Evaluation,
+			BestAnswer: question.BestAnswer,
+			UserAnswer: req.UserAnswer,
+			XP:         userAnswerEvaluation.XPGained,
+		}, nil
+	}
 	return &response.EvaluateSubjectiveAnswerResponse{
-		Evaluation: userAnswerEvaluation.Evaluation,
-		BestAnswer: question.BestAnswer,
-		UserAnswer: req.UserAnswer,
-		XP:         userAnswerEvaluation.XPGained,
+		Evaluation:     userAnswerEvaluation.Evaluation,
+		BestAnswer:     question.BestAnswer,
+		UserAnswer:     req.UserAnswer,
+		XP:             userAnswerEvaluation.XPGained,
+		TotalXP:        totalXP,
+		TotalTimeTaken: int64(totalTimeTaken),
 	}, nil
 }

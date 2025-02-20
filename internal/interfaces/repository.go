@@ -27,6 +27,7 @@ type SectionRepository interface {
 	GetNextSectionId(sectionId string) (string, error)
 	GetSectionById(sectionId string) (*response.Section, error)
 	DeleteSectionProgress(userId string, sectionId string) error
+	GetTimeStamp(userId string, sectionId string) (int64, error)
 }
 
 type QuestionRepository interface {

@@ -65,7 +65,7 @@ func (c *UserRepository) UpdateUserXP(userId string, xp int) error {
 	ctx := context.Background()
 
 	var updates = make(map[string]interface{})
-	updates["XP"] = map[string]interface{}{".sv": map[string]interface{}{"increment": xp}}
+	updates["xp"] = map[string]interface{}{".sv": map[string]interface{}{"increment": xp}}
 
 	if len(updates) > 0 {
 		if err := c.firebaseDB.NewRef("users").Child(userId).Update(ctx, updates); err != nil {
@@ -77,7 +77,7 @@ func (c *UserRepository) UpdateUserXP(userId string, xp int) error {
 
 func (c *UserRepository) GetXP(userId string) (int, error) {
 	var xp int
-	err := c.firebaseDB.NewRef("users").Child(userId).Child("XP").Get(context.Background(), &xp)
+	err := c.firebaseDB.NewRef("users").Child(userId).Child("xp").Get(context.Background(), &xp)
 	if err != nil {
 		return 0, fmt.Errorf("error querying database: %v", err)
 	}

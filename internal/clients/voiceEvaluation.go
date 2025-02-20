@@ -34,7 +34,7 @@ func VoiceEvaluation(buf []byte) (*response.VoiceEvaluation, error) {
 		return nil, fmt.Errorf("request failed: %w", err[0])
 	}
 
-	if statusCode != fiber.StatusOK  {
+	if statusCode != fiber.StatusOK {
 		return nil, fmt.Errorf("request failed")
 	}
 
@@ -46,7 +46,7 @@ func VoiceEvaluation(buf []byte) (*response.VoiceEvaluation, error) {
 	if voiceEvaluation.Status != "success" {
 		return nil, fmt.Errorf("voice evaluation failed")
 	}
-	
+
 	fmt.Println(voiceEvaluation.AudioFeatures)
 	fmt.Println(voiceEvaluation.Status)
 	fmt.Println(voiceEvaluation.Top3Emotions)
