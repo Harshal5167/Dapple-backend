@@ -9,4 +9,5 @@ type Handler struct {
 	QuestionHandler   interfaces.QuestionHandler
 	LessonHandler     interfaces.LessonHandler
 	UserCourseHandler interfaces.UserCourseHandler
+	EvaluationHandler interfaces.EvaluationHandler
 }

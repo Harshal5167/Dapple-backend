@@ -33,6 +33,7 @@ type QuestionRepository interface {
 	AddQuestion(question model.Question) (string, error)
 	GetQuestionById(questionId string) (*model.Question, error)
 	GetHint(questionId string) (string, error)
+	GetEvaluationByQuestionId(questionId string) (string, error)
 }
 
 type LessonRepository interface {
@@ -51,4 +52,10 @@ type UserRepository interface {
 	GetUserDetailsFromEmail(email string) (*model.User, error)
 	GetUserById(userId string) (*model.User, error)
 	UpdateUserXP(userId string, xp int) error
+	GetXP(userId string) (int, error)
+}
+
+type EvaluationRepository interface {
+	AddVoiceEvaluation(voiceEvaluation model.VoiceEvaluation) (string, error)
+	GetVoiceEvaluationById(evaluationId string) (*model.VoiceEvaluation, error)
 }

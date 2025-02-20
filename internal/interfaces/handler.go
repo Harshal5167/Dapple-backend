@@ -22,8 +22,6 @@ type SectionHandler interface {
 
 type QuestionHandler interface {
 	AddQuestion(c *fiber.Ctx) error
-	EvaluateObjectiveAnswer(c *fiber.Ctx) error
-	EvaluateSubjectiveAnswer(c *fiber.Ctx) error
 	GetHint(c *fiber.Ctx) error
 }
 
@@ -33,4 +31,14 @@ type LessonHandler interface {
 
 type UserCourseHandler interface {
 	GetUserCourse(c *fiber.Ctx) error
+}
+
+type UserHandler interface {
+	GetXP(c *fiber.Ctx) error
+}
+
+type EvaluationHandler interface {
+	EvaluateSubjectiveAnswer(c *fiber.Ctx) error
+	EvaluateObjectiveAnswer(c *fiber.Ctx) error
+	EvaluateVoiceAnswer(c *fiber.Ctx) error
 }

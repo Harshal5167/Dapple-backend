@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/Harshal5167/Dapple-backend/config"
 	"github.com/Harshal5167/Dapple-backend/internal/dto/request"
 	"github.com/Harshal5167/Dapple-backend/internal/dto/response"
 	"github.com/Harshal5167/Dapple-backend/internal/interfaces"
@@ -79,7 +80,7 @@ func (s *SectionService) GetSectionData(userId string, sectionId string) (*respo
 					return nil
 				}(),
 			})
-		} else if question.Type == model.Subjective {
+		} else if question.Type == model.Subjective || question.Type == model.Voice || question.Type == model.Test {
 			questionList = append(questionList, map[string]interface{}{
 				"questionId": questionId,
 				"type":       question.Type,
@@ -116,16 +117,16 @@ func (s *SectionService) GetSectionData(userId string, sectionId string) (*respo
 	}
 
 	var data []map[string]interface{}
-	for i := 0; i < min(MaxNoOfLessons/2, len(lessonList)); i++ {
+	for i := 0; i < min(config.MaxNoOfLessons/2, len(lessonList)); i++ {
 		data = append(data, lessonList[i])
 	}
-	for i := 0; i < min(MaxNoOfQuestions/2, len(questionList)); i++ {
+	for i := 0; i < min(config.MaxNoOfQuestions/2, len(questionList)); i++ {
 		data = append(data, questionList[i])
 	}
-	for i := MaxNoOfLessons / 2; i < len(lessonList); i++ {
+	for i := config.MaxNoOfLessons / 2; i < len(lessonList); i++ {
 		data = append(data, lessonList[i])
 	}
-	for i := MaxNoOfQuestions / 2; i < len(questionList); i++ {
+	for i := config.MaxNoOfQuestions / 2; i < len(questionList); i++ {
 		data = append(data, questionList[i])
 	}
 
@@ -140,7 +141,7 @@ func (s *SectionService) GetSectionData(userId string, sectionId string) (*respo
 	}, nil
 }
 
-func (s *SectionService) AddCompleteSection(req *model.SectionData, levelId string) error {
+func (s *SectionService) AddCompleteSection(req *request.SectionData, levelId string) error {
 	addSectionResponse, err := s.AddSection(&request.AddSectionRequest{
 		Name:    req.Name,
 		LevelId: levelId,
@@ -152,16 +153,17 @@ func (s *SectionService) AddCompleteSection(req *model.SectionData, levelId stri
 
 	for _, question := range req.Questions {
 		_, err := s.questionService.AddQuestion(&request.AddQuestionRequest{
-			QuestionText:  question.QuestionText,
-			Options:       question.Options,
-			Hint:          question.Hint,
-			CorrectOption: question.CorrectOption,
-			SectionId:     addSectionResponse.SectionId,
-			ImageUrl:      question.ImageUrl,
-			Type:          question.Type,
-			BestAnswer:    question.BestAnswer,
-			Explanation:   question.Explanation,
-			XP:            question.XP,
+			QuestionText:    question.QuestionText,
+			Options:         question.Options,
+			Hint:            question.Hint,
+			CorrectOption:   question.CorrectOption,
+			SectionId:       addSectionResponse.SectionId,
+			ImageUrl:        question.ImageUrl,
+			Type:            question.Type,
+			BestAnswer:      question.BestAnswer,
+			Explanation:     question.Explanation,
+			XP:              question.XP,
+			VoiceEvaluation: question.VoiceEvaluation,
 		})
 		if err != nil {
 			return err

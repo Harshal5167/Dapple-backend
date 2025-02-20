@@ -48,3 +48,13 @@ func (c *QuestionRepository) GetHint(questionId string) (string, error) {
 	}
 	return hint, nil
 }
+
+func (c *QuestionRepository) GetEvaluationByQuestionId(questionId string) (string, error) {
+	ctx := context.Background()
+
+	var evaluationId string
+	if err := c.firebaseDB.NewRef("questions").Child(questionId).Child("evaluation").Get(ctx, &evaluationId); err != nil {
+		return "", err
+	}
+	return evaluationId, nil
+}

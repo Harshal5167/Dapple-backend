@@ -9,7 +9,7 @@ type VoiceEvaluation struct {
 }
 
 type Emotion struct {
-	Type       string  `json:"type"`
+	Emotion    string  `json:"emotion"`
 	Confidence float64 `json:"confidence"`
 }
 
@@ -24,11 +24,11 @@ type VolumeMean struct {
 }
 
 type SpectralCentroid struct {
-	Min int `json:"min"`
-	Max int `json:"max"`
+	Min float64 `json:"min"`
+	Max float64 `json:"max"`
 }
 
 type Tempo struct {
-	Min int `json:"min"`
-	Max int `json:"max"`
+	Min float64 `json:"min"`
+	Max float64 `json:"max"`
 }

@@ -8,11 +8,13 @@ import (
 
 type QuestionRoute struct {
 	questionHandler interfaces.QuestionHandler
+	evaluationHandler interfaces.EvaluationHandler
 }
 
-func NewQuestionRoute(questionHandler interfaces.QuestionHandler) *QuestionRoute {
+func NewQuestionRoute(questionHandler interfaces.QuestionHandler, evaluationHandler interfaces.EvaluationHandler) *QuestionRoute {
 	return &QuestionRoute{
 		questionHandler: questionHandler,
+		evaluationHandler: evaluationHandler,
 	}
 }
 
@@ -22,7 +24,7 @@ func (r *QuestionRoute) QuestionRoutes(app *fiber.App) {
 	question.Post("/", r.questionHandler.AddQuestion)
 	question.Get("/:questionId/hint", middleware.IsAuth, r.questionHandler.GetHint)
 	evaluateAnswer := question.Group("/evaluate-answer", middleware.IsAuth)
-	evaluateAnswer.Post("/objective", r.questionHandler.EvaluateObjectiveAnswer)
-	evaluateAnswer.Post("/subjective", r.questionHandler.EvaluateSubjectiveAnswer)
-	// evaluateAnswer.Post("/voice", r.questionHandler.EvaluateVoiceAnswer)
+	evaluateAnswer.Post("/objective", r.evaluationHandler.EvaluateObjectiveAnswer)
+	evaluateAnswer.Post("/subjective", r.evaluationHandler.EvaluateSubjectiveAnswer)
+	evaluateAnswer.Post("/voice", r.evaluationHandler.EvaluateVoiceAnswer)
 }

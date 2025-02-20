@@ -45,7 +45,7 @@ func (s *LevelService) AddCompleteLevel(req *request.AddCompleteLevelRequest) (*
 	}
 
 	for _, section := range req.Sections {
-		err := s.sectionService.AddCompleteSection(&model.SectionData{
+		err := s.sectionService.AddCompleteSection(&request.SectionData{
 			Name:      section.Name,
 			TotalXP:   section.TotalXP,
 			Questions: section.Questions,

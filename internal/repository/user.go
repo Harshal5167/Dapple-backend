@@ -74,3 +74,12 @@ func (c *UserRepository) UpdateUserXP(userId string, xp int) error {
 	}
 	return nil
 }
+
+func (c *UserRepository) GetXP(userId string) (int, error) {
+	var xp int
+	err := c.firebaseDB.NewRef("users").Child(userId).Child("XP").Get(context.Background(), &xp)
+	if err != nil {
+		return 0, fmt.Errorf("error querying database: %v", err)
+	}
+	return xp, nil
+}

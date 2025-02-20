@@ -10,4 +10,5 @@ type Services struct {
 	QuestionService   interfaces.QuestionService
 	LessonService     interfaces.LessonService
 	UserCourseService interfaces.UserCourseService
+	EvaluationService interfaces.EvaluationService
 }

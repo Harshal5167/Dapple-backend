@@ -10,6 +10,6 @@ type User struct {
 	Profession              string   `json:"profession"`
 	SocialChallenges        []string `json:"socialChallenges"`
 	StrugglingSocialSetting []string `json:"strugglingSocialSetting"`
-	XP                      int      `json:"XP"`
+	XP                      int      `json:"xp"`
 	Gender                  string   `json:"gender"`
 }

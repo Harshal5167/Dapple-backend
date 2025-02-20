@@ -7,9 +7,9 @@ import (
 	"github.com/Harshal5167/Dapple-backend/internal/dto/response"
 	"github.com/Harshal5167/Dapple-backend/internal/interfaces"
 	"github.com/Harshal5167/Dapple-backend/internal/model"
+	"github.com/Harshal5167/Dapple-backend/config"
 )
 
-var MaxNoOfLessons int = 4
 type LessonService struct {
 	lessonRepo  interfaces.LessonRepository
 	sectionRepo interfaces.SectionRepository
@@ -28,7 +28,7 @@ func (s *LessonService) AddLesson(req *request.AddLessonRequest) (*response.AddL
 		return nil, err
 	}
 
-	if noOfLessons >= MaxNoOfLessons {
+	if noOfLessons >= config.MaxNoOfLessons {
 		return nil, fmt.Errorf("cannot add more lessons to a section")
 	}
 

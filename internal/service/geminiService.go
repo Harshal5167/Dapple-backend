@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/Harshal5167/Dapple-backend/config"
 	"github.com/Harshal5167/Dapple-backend/internal/dto/response"
 	"github.com/Harshal5167/Dapple-backend/internal/interfaces"
 	"github.com/Harshal5167/Dapple-backend/internal/model"
@@ -25,7 +26,7 @@ func NewGeminiService(client *genai.Client) interfaces.GeminiService {
 
 func (s *geminiService) GenerateUserCourse(user model.User, levelDetails []map[string]string) (*response.LevelsForUser, error) {
 	ctx := context.Background()
-	model := s.client.GenerativeModel("gemini-1.0-pro")
+	model := s.client.GenerativeModel(config.ModelName)
 
 	promptTemplate := `You are a neurodiverse expert which focuses on overcoming social interactions anxiety and teach patients social cues.
 	You have to design a course for user which will help them to overcome their social anxiety and improve their social skills.
@@ -51,15 +52,14 @@ func (s *geminiService) GenerateUserCourse(user model.User, levelDetails []map[s
 	3. Help him overcome his social challenges.
 	4. Help him perform better in his struggling social settings.
 	
-	Return your response in the following JSON format:
-	{
+	Return your response in the following json format:
+	` + "`" + "`" + "`" + `json{
 		"selectedLevelIds": [
 			"levelId"
 		]
-	}
+	}` + "`" + "`" + "`" + `
 	Note that you have to select exactly 1 levels so the selectedLevels should contains 1 levelIds.
-	Don't use backticks while giving the response.
-	
+	Give the response like json format with the response wrapped in json and backticks (just like standard json format).
 	`
 
 	levelDetailsString := utils.BuildStringForLevels(levelDetails)
@@ -94,9 +94,15 @@ func (s *geminiService) GenerateUserCourse(user model.User, levelDetails []map[s
 	}
 
 	fmt.Println(responseText.String())
+	start := strings.Index(responseText.String(), "```json") + 7
+	end := strings.LastIndex(responseText.String(), "```")
+	if start == -1 || end == -1 || start >= end {
+		return nil, fmt.Errorf("invalid format")
+	}
+	jsonStr := responseText.String()[start:end]
 
 	var response response.LevelsForUser
-	err = json.Unmarshal([]byte(responseText.String()), &response)
+	err = json.Unmarshal([]byte(jsonStr), &response)
 	if err != nil {
 		return nil, fmt.Errorf("parsing error: %v", err)
 	}
@@ -110,7 +116,7 @@ func (s *geminiService) GenerateUserCourse(user model.User, levelDetails []map[s
 
 func (s *geminiService) EvaluateUserAnswer(user *model.User, question *model.Question, userAnswer []string) (*model.UserAnswerEvalutaion, error) {
 	ctx := context.Background()
-	gemini := s.client.GenerativeModel("gemini-1.0-pro")
+	gemini := s.client.GenerativeModel(config.ModelName)
 
 	promptTemplate := `You are a neurodiverse expert which focuses on overcoming social interactions anxiety and teach patients social cues.
 		I am providing you a user profile and his/her details and a question which he/she has answered. You have to evaluate the user's answer based on the given criteria and provide some feedback to it in the specific format.
@@ -139,8 +145,8 @@ func (s *geminiService) EvaluateUserAnswer(user *model.User, question *model.Que
 		Analyze the user answer based on his profile and question and create a personalized feedback for him in the below given format.
 		You have to provide feedback like key concepts which he/she should focus while answering such questions and key points to answer better after evaluating his response.
 		Don't add his name anywhere in the response that was given to you just for reference.
-		Return your response in the following JSON format:
-		{
+		Return your response in the following json format:
+		` + "`" + "`" + "`" + `json{
 			"Evaluation":[
 				{
 					"title": "Key Concepts to Focus",
@@ -152,10 +158,11 @@ func (s *geminiService) EvaluateUserAnswer(user *model.User, question *model.Que
 				}
 			],
 			"xpGained": "based on the user answer give him a xp which you think he should get out of the total xp of that question. also the xp should be in multiple of 10 like 10,20,30,... give the xp generously and dont be stingy in giving it and should not exceed the total xp of the question and not 0." (int)
-		}
+		}` + "`" + "`" + "`" + `
 		Note that you have to write the two things very nicely in a good way as per the user profile and as per the user answer. you can always refer to the best answer.
 		THE CONTENT FIELD SHOULD NOT CONTAIN ANY SPECIAL CHARACTERS LIKE SINGLE OR DOUBLE QUOTES OR NUMBERS IT SHOULD BE PLAIN TEXT NOT IN README FORM NEITHER WITH \N AND \T TYPE THINGS. REMEMBER THIS WHILE GENERATING THE RESPONSE.
 		REMEMBER NO DOUBLE QUOTES OR SINGLE QUOTES OR NUMBERS IN THE CONTENT FIELD.
+		Give the response like json format with the response wrapped in json and backticks (just like standard json format).
 		`
 
 	prompt := fmt.Sprintf(
@@ -192,12 +199,113 @@ func (s *geminiService) EvaluateUserAnswer(user *model.User, question *model.Que
 	}
 
 	fmt.Println(responseText)
+	start := strings.Index(responseText, "```json") + 7
+	end := strings.LastIndex(responseText, "```")
+	if start == -1 || end == -1 || start >= end {
+		fmt.Println("Invalid format")
+		return nil, fmt.Errorf("invalid format")
+	}
+	jsonStr := responseText[start:end]
+	fmt.Println(jsonStr)
 
 	response := &model.UserAnswerEvalutaion{}
-	err = json.Unmarshal([]byte(responseText), response)
+	err = json.Unmarshal([]byte(jsonStr), response)
 	if err != nil {
 		return nil, fmt.Errorf("parsing error: %v", err)
 	}
 
+	return response, nil
+}
+
+func (s *geminiService) FormatVoiceEvaluationResponse(obtainedVoiceEvaluation *response.VoiceEvaluation, desiredVoiceEvaluation *model.VoiceEvaluation) (*model.UserAnswerEvalutaion, error) {
+	ctx := context.Background()
+	gemini := s.client.GenerativeModel(config.ModelName)
+
+	promptTemplate := `I'm providing you the desired voice evaluation for a question and also the obtained evaluation from the user's voice. You have to format the obtained evaluation and the desired evaluation in a user friendly layman language so that he can understand it easily and can work on it.
+	Explain both the things in a very simple language and in a very easy way so that he can understand it easily.
+
+	Obtianed Evaluation
+	- Top Emotions identified from his voice: %s
+	- Spectral Centroid of voice: %f
+	- Tempo of voice: %f 
+	- Volume Mean: %f
+	- Speech Rate of the voice: %f
+
+	Desired Evaluation output
+	- Desired Top Emotions: %s
+	- Desired Spectral Centroid: %s
+	- Desired Tempo of voice: %s 
+	- Desired Volume Mean: %s
+	- Desired Speech Rate of the voice: %s
+
+	Dont show him numbers for this things or neither the complex names of this fields, you change and explain him in the most easy way so that he can understand it clearly.
+	Return your response in the following json format:
+	` + "`" + "`" + "`" + `json{
+		"Evaluation":[
+			{
+				"title": "Your Voice Evaluation",
+				"content": "here explain him in easy terms for the obtained evaluation. this field should not contain more than 50 words"
+			},
+			{
+				"title": "Key Points to Answer Better",
+				"content": "here explain him in easy terms for the desired evaluation. This field should not contain more than 50 words"
+			}
+		]
+	}` + "`" + "`" + "`" + `
+	Note that you have to write the two things very nicely in a good way.
+	THE CONTENT FIELD SHOULD NOT CONTAIN ANY SPECIAL CHARACTERS LIKE SINGLE OR DOUBLE QUOTES OR NUMBERS IT SHOULD BE PLAIN TEXT NOT IN README FORM NEITHER WITH \N AND \T TYPE THINGS. REMEMBER THIS WHILE GENERATING THE RESPONSE.
+	REMEMBER NO DOUBLE QUOTES OR SINGLE QUOTES OR NUMBERS IN THE CONTENT FIELD.
+	Give the response like json format with the response wrapped in json and backticks (just like standard json format).
+	`
+
+	obtainedEmotions := utils.BuildStringForEmotions(obtainedVoiceEvaluation.Top3Emotions)
+	desiredEmotions := utils.BuildStringForEmotions(desiredVoiceEvaluation.Emotions)
+
+	prompt := fmt.Sprintf(
+		promptTemplate,
+		obtainedEmotions,
+		obtainedVoiceEvaluation.AudioFeatures.SpectralCentroid,
+		obtainedVoiceEvaluation.AudioFeatures.Tempo,
+		obtainedVoiceEvaluation.AudioFeatures.VolumeMean,
+		obtainedVoiceEvaluation.AudioFeatures.SpeechRate,
+		desiredEmotions,
+		fmt.Sprintf("max: %f, min: %f", desiredVoiceEvaluation.SpectralCentroid.Max, desiredVoiceEvaluation.SpectralCentroid.Min),
+		fmt.Sprintf("max: %f, min: %f", desiredVoiceEvaluation.Tempo.Max, desiredVoiceEvaluation.Tempo.Min),
+		fmt.Sprintf("max: %f, min: %f", desiredVoiceEvaluation.VolumeMean.Max, desiredVoiceEvaluation.VolumeMean.Min),
+		fmt.Sprintf("max: %f, min: %f", desiredVoiceEvaluation.SpeechRate.Max, desiredVoiceEvaluation.SpeechRate.Min))
+
+	resp, err := gemini.GenerateContent(ctx, genai.Text(prompt))
+	if err != nil {
+		return nil, fmt.Errorf("generate content error: %v", err)
+	}
+
+	if resp == nil || len(resp.Candidates) == 0 {
+		return nil, fmt.Errorf("no response generated")
+	}
+
+	candidate := resp.Candidates[0]
+	if candidate.Content == nil || len(candidate.Content.Parts) == 0 {
+		return nil, fmt.Errorf("empty response content")
+	}
+
+	responseText := ""
+	for _, part := range candidate.Content.Parts {
+		responseText += fmt.Sprintf("%v", part)
+	}
+
+	fmt.Println(responseText)
+	start := strings.Index(responseText, "```json") + 7
+	end := strings.LastIndex(responseText, "```")
+	if start == -1 || end == -1 || start >= end {
+		fmt.Println("Invalid format")
+		return nil, fmt.Errorf("invalid format")
+	}
+	jsonStr := responseText[start:end]
+
+	response := &model.UserAnswerEvalutaion{}
+	err = json.Unmarshal([]byte(jsonStr), response)
+	if err != nil {
+		return nil, fmt.Errorf("parsing error: %v", err)
+	}
 	return response, nil
 }

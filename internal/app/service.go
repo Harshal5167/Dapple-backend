@@ -19,6 +19,7 @@ func (a *App) InitializeServices() {
 		a.Services.GeminiService,
 		a.Repositories.UserRepo,
 		a.Services.UserCourseService,
+		a.Repositories.EvaluationRepo,
 	)
 	a.Services.LessonService = service.NewLessonService(
 		a.Repositories.LessonRepo,
@@ -40,5 +41,13 @@ func (a *App) InitializeServices() {
 	a.Services.LevelService = service.NewLevelService(
 		a.Repositories.LevelRepo,
 		a.Services.SectionService,
+	)
+	a.Services.EvaluationService = service.NewEvaluationService(
+		a.Repositories.EvaluationRepo,
+		a.Repositories.QuestionRepo,
+		a.Services.GeminiService,
+		a.Repositories.SectionRepo,
+		a.Services.UserCourseService,
+		a.Repositories.UserRepo,
 	)
 }

@@ -19,14 +19,12 @@ type LevelService interface {
 type SectionService interface {
 	AddSection(req *request.AddSectionRequest) (*response.AddSectionResponse, error)
 	GetSectionData(userId string, sectionId string) (*response.SectionData, error)
-	AddCompleteSection(section *model.SectionData, levelId string) error
+	AddCompleteSection(section *request.SectionData, levelId string) error
 	UpdateSectionProgress(userId string, lessonId string) error
 }
 
 type QuestionService interface {
 	AddQuestion(req *request.AddQuestionRequest) (*response.AddQuestionResponse, error)
-	EvaluateSubjectiveAnswer(userId string, req *request.EvaluateSubjectiveAnswerReq) (*response.EvaluateSubjectiveAnswerResponse, error)
-	EvaluateObjectiveAnswer(userId string, req *request.EvaluateObjectiveAnswerReq) (*response.EvaluateObjectiveAnswerResponse, error)
 	GetHint(questionId string) (*response.GetHintResponse, error)
 }
 
@@ -43,4 +41,15 @@ type UserCourseService interface {
 type GeminiService interface {
 	GenerateUserCourse(user model.User, levelDetails []map[string]string) (*response.LevelsForUser, error)
 	EvaluateUserAnswer(user *model.User, question *model.Question, userAnswer []string) (*model.UserAnswerEvalutaion, error)
+	FormatVoiceEvaluationResponse(obtainedVoiceEvaluation *response.VoiceEvaluation, desiredVoiceEvaluation *model.VoiceEvaluation) (*model.UserAnswerEvalutaion, error)
+}
+
+type UserService interface {
+	GetXP(userId string) (*response.GetXP, error)
+}
+
+type EvaluationService interface {
+	EvaluateSubjectiveAnswer(userId string, req *request.EvaluateSubjectiveAnswerReq) (*response.EvaluateSubjectiveAnswerResponse, error)
+	EvaluateObjectiveAnswer(userId string, req *request.EvaluateObjectiveAnswerReq) (*response.EvaluateObjectiveAnswerResponse, error)
+	EvaluateVoiceAnswer(userId string, req *request.EvaluateVoiceAnswerReq, buf []byte) (*response.EvaluateVoiceAnswerResponse, error)
 }
