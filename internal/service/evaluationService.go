@@ -1,11 +1,10 @@
 package service
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/Harshal5167/Dapple-backend/config"
-	"github.com/Harshal5167/Dapple-backend/internal/clients"
+	"github.com/Harshal5167/Dapple-backend/internal/clients/voiceEvaluation"
 	"github.com/Harshal5167/Dapple-backend/internal/dto/request"
 	"github.com/Harshal5167/Dapple-backend/internal/dto/response"
 	"github.com/Harshal5167/Dapple-backend/internal/interfaces"
@@ -18,6 +17,7 @@ type EvaluationService struct {
 	sectionRepo       interfaces.SectionRepository
 	userCourseService interfaces.UserCourseService
 	userRepo          interfaces.UserRepository
+	testRepo          interfaces.TestRepository
 }
 
 func NewEvaluationService(evaluationRepo interfaces.EvaluationRepository,
@@ -26,6 +26,7 @@ func NewEvaluationService(evaluationRepo interfaces.EvaluationRepository,
 	sectionRepo interfaces.SectionRepository,
 	userCourseService interfaces.UserCourseService,
 	userRepo interfaces.UserRepository,
+	testRepo interfaces.TestRepository,
 ) *EvaluationService {
 	return &EvaluationService{
 		evaluationRepo:    evaluationRepo,
@@ -34,11 +35,12 @@ func NewEvaluationService(evaluationRepo interfaces.EvaluationRepository,
 		sectionRepo:       sectionRepo,
 		userCourseService: userCourseService,
 		userRepo:          userRepo,
+		testRepo:          testRepo,
 	}
 }
 
 func (s *EvaluationService) EvaluateVoiceAnswer(userId string, req *request.EvaluateVoiceAnswerReq, buf []byte) (*response.EvaluateVoiceAnswerResponse, error) {
-	voiceEvaluation, err := clients.VoiceEvaluation(buf)
+	voiceEvaluation, err := voiceEvaluation.VoiceEvaluation(buf)
 	if err != nil {
 		return nil, err
 	}
@@ -163,7 +165,6 @@ func (s *EvaluationService) EvaluateObjectiveAnswer(userId string, req *request.
 }
 
 func (s *EvaluationService) EvaluateSubjectiveAnswer(userId string, req *request.EvaluateSubjectiveAnswerReq) (*response.EvaluateSubjectiveAnswerResponse, error) {
-	fmt.Println("1")
 	question, err := s.questionRepo.GetQuestionById(req.QuestionId)
 	if err != nil {
 		return nil, err

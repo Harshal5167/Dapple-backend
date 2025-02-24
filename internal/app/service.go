@@ -37,6 +37,7 @@ func (a *App) InitializeServices() {
 		a.Repositories.LessonRepo,
 		a.Services.QuestionService,
 		a.Services.LessonService,
+		a.Repositories.TestRepo,
 	)
 	a.Services.LevelService = service.NewLevelService(
 		a.Repositories.LevelRepo,
@@ -49,5 +50,20 @@ func (a *App) InitializeServices() {
 		a.Repositories.SectionRepo,
 		a.Services.UserCourseService,
 		a.Repositories.UserRepo,
+		a.Repositories.TestRepo,
+	)
+	a.Services.UserService = service.NewUserService(
+		a.Repositories.UserRepo,
+	)
+	a.Services.TestService = service.NewTestService(
+		a.Services.GeminiService,
+		a.Repositories.TestRepo,
+		a.Repositories.SectionRepo,
+		a.Repositories.QuestionRepo,
+		a.Repositories.EvaluationRepo,
+		a.Services.UserCourseService,
+	)
+	a.Services.SocketService = service.NewSocketService(
+		a.Services.TestService,
 	)
 }

@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/Harshal5167/Dapple-backend/config"
+	"github.com/Harshal5167/Dapple-backend/internal/clients/videoEvaluation"
 	"github.com/Harshal5167/Dapple-backend/internal/dto/request"
 	"github.com/Harshal5167/Dapple-backend/internal/dto/response"
 	"github.com/Harshal5167/Dapple-backend/internal/interfaces"
@@ -15,6 +16,7 @@ type SectionService struct {
 	lessonRepo      interfaces.LessonRepository
 	questionService interfaces.QuestionService
 	lessonService   interfaces.LessonService
+	testRepo        interfaces.TestRepository
 }
 
 func NewSectionService(
@@ -23,7 +25,8 @@ func NewSectionService(
 	questionRepo interfaces.QuestionRepository,
 	lessonRepo interfaces.LessonRepository,
 	questionService interfaces.QuestionService,
-	lessonService interfaces.LessonService) *SectionService {
+	lessonService interfaces.LessonService,
+	testRepo interfaces.TestRepository) *SectionService {
 	return &SectionService{
 		sectionRepo:     sectionRepo,
 		levelRepo:       levelRepo,
@@ -31,6 +34,7 @@ func NewSectionService(
 		lessonRepo:      lessonRepo,
 		questionService: questionService,
 		lessonService:   lessonService,
+		testRepo:        testRepo,
 	}
 }
 
@@ -55,6 +59,14 @@ func (s *SectionService) AddSection(req *request.AddSectionRequest) (*response.A
 }
 
 func (s *SectionService) GetSectionData(userId string, sectionId string) (*response.SectionData, error) {
+	nextSectionId, err := s.sectionRepo.GetNextSectionId(sectionId)
+	if err != nil {
+		return nil, err
+	}
+
+	if nextSectionId == "" {
+		return s.GetTestData(sectionId)
+	}
 	questions, lessons, err := s.sectionRepo.GetQuestionsAndLessons(sectionId)
 	if err != nil {
 		return nil, err
@@ -164,6 +176,7 @@ func (s *SectionService) AddCompleteSection(req *request.SectionData, levelId st
 			Explanation:     question.Explanation,
 			XP:              question.XP,
 			VoiceEvaluation: question.VoiceEvaluation,
+			VideoEvaluation: question.VideoEvaluation,
 		})
 		if err != nil {
 			return err
@@ -200,4 +213,47 @@ func (s *SectionService) UpdateSectionProgress(userId string, lessonId string) e
 		return err
 	}
 	return nil
+}
+
+func (s *SectionService) GetTestData(sectionId string) (*response.SectionData, error) {
+	questions, _, err := s.sectionRepo.GetQuestionsAndLessons(sectionId)
+	if err != nil {
+		return nil, err
+	}
+
+	var sessionId string
+	sessionId, err = videoEvaluation.StartSession()
+	if err != nil {
+		return nil, err
+	}
+
+	var questionList []map[string]interface{}
+	for _, questionId := range questions {
+		question, err := s.questionRepo.GetQuestionById(questionId)
+		if err != nil {
+			return nil, err
+		}
+		questionList = append(questionList, map[string]interface{}{
+			"questionId": questionId,
+			"type":       question.Type,
+			"question":   question.QuestionText,
+			"xp":         question.XP,
+			"imageUrl": func() interface{} {
+				if question.ImageUrl != "" {
+					return question.ImageUrl
+				}
+				return nil
+			}(),
+		})
+	}
+
+	err = s.testRepo.StoreTestSession(sessionId, sectionId)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response.SectionData{
+		Data:      questionList,
+		SessionId: sessionId,
+	}, nil
 }

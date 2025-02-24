@@ -10,4 +10,6 @@ type Handler struct {
 	LessonHandler     interfaces.LessonHandler
 	UserCourseHandler interfaces.UserCourseHandler
 	EvaluationHandler interfaces.EvaluationHandler
+	UserHandler       interfaces.UserHandler
+	SocketHandler     interfaces.SocketHandler
 }

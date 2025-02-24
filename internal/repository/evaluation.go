@@ -35,3 +35,22 @@ func (c *EvaluationRepository) GetVoiceEvaluationById(evaluationId string) (*mod
 
 	return &voiceEvaluation, nil
 }
+
+func (c *EvaluationRepository) AddVideoEvaluation(videoEvaluation model.Emotion) (string, error) {
+	ref, err := c.firebaseDB.NewRef("evaluations").Child("video").Push(context.Background(), videoEvaluation)
+	if err != nil {
+		return "", err
+	}
+
+	return ref.Key, nil
+}
+
+func (c *EvaluationRepository) GetVideoEvaluationById(evaluationId string) (*model.Emotion, error) {
+	var videoEvaluation model.Emotion
+	err := c.firebaseDB.NewRef("evaluations").Child("video").Child(evaluationId).Get(context.Background(), &videoEvaluation)
+	if err != nil {
+		return nil, err
+	}
+
+	return &videoEvaluation, nil
+}

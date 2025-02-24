@@ -14,6 +14,7 @@ type AddQuestionRequest struct {
 	Explanation     []string              `json:"explanation,omitempty"`
 	XP              int                   `json:"xp"`
 	VoiceEvaluation model.VoiceEvaluation `json:"voiceEvaluation,omitempty"`
+	VideoEvaluation model.Emotion         `json:"videoEvaluation,omitempty"`
 }
 
 type EvaluateSubjectiveAnswerReq struct {

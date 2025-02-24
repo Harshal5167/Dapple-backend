@@ -11,4 +11,5 @@ type Repositories struct {
 	UserCourseRepo interfaces.UserCourseRepository
 	UserRepo       interfaces.UserRepository
 	EvaluationRepo interfaces.EvaluationRepository
+	TestRepo       interfaces.TestRepository
 }

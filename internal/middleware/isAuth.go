@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/Harshal5167/Dapple-backend/internal/utils"
@@ -46,6 +47,8 @@ func IsAuth(c *fiber.Ctx) error {
 
 	c.Locals("userId", userId)
 	c.Locals("email", email)
+
+	fmt.Println(userId, email)
 
 	return c.Next()
 }

@@ -42,3 +42,11 @@ type EvaluationHandler interface {
 	EvaluateObjectiveAnswer(c *fiber.Ctx) error
 	EvaluateVoiceAnswer(c *fiber.Ctx) error
 }
+
+type SocketHandler interface {
+	HandleWebSocket() func(c *fiber.Ctx) error
+}
+
+type TestHandler interface {
+	GetTestResult(c *fiber.Ctx) error
+}

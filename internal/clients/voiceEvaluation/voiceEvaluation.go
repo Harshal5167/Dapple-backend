@@ -1,4 +1,4 @@
-package clients
+package voiceEvaluation
 
 import (
 	"encoding/json"

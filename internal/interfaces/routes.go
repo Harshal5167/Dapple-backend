@@ -29,3 +29,7 @@ type UserCourseRoutes interface {
 type UserRoutes interface {
 	UserRoutes(app *fiber.App)
 }
+
+type TestRoutes interface {
+	TestRoutes(app *fiber.App)
+}

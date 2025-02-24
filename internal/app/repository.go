@@ -13,4 +13,5 @@ func (a *App) InitializeRepositories() {
 	a.Repositories.UserCourseRepo = repository.NewUserCourseRepository(a.config.FirebaseDB)
 	a.Repositories.UserRepo = repository.NewUserRepository(a.config.FirebaseDB)
 	a.Repositories.EvaluationRepo = repository.NewEvaluation(a.config.FirebaseDB)
+	a.Repositories.TestRepo = repository.NewTestRepository(a.config.Redis)
 }

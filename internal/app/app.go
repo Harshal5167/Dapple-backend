@@ -2,7 +2,7 @@ package app
 
 import (
 	"github.com/Harshal5167/Dapple-backend/config"
-	"github.com/Harshal5167/Dapple-backend/internal/types"
+	"github.com/Harshal5167/Dapple-backend/internal/app/types"
 	"github.com/gofiber/fiber/v2"
 )
 

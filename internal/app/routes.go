@@ -11,4 +11,6 @@ func (a *App) InitializeRoutes() {
 	routes.NewQuestionRoute(a.Handler.QuestionHandler, a.Handler.EvaluationHandler).QuestionRoutes(a.Fiber)
 	routes.NewLessonRoutes(a.Handler.LessonHandler).LessonRoutes(a.Fiber)
 	routes.NewUserCourseRoutes(a.Handler.UserCourseHandler).UserCourseRoutes(a.Fiber)
+	routes.NewUserRoute(a.Handler.UserHandler).UserRoutes(a.Fiber)
+	routes.NewSocketRoutes(a.Handler.SocketHandler).SetupRoutes(a.Fiber)
 }

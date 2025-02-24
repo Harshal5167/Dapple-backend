@@ -15,3 +15,16 @@ type AudioFeatures struct {
 	SpectralCentroid float64 `json:"spectral_centroid"`
 	Tempo            float64 `json:"tempo"`
 }
+
+type QuestionResult struct {
+	AverageEmotion    string        `json:"average_emotion"`
+	AverageConfidence float64       `json:"average_confidence"`
+	ResultSummary     ResultSummary `json:"summary"`
+}
+
+type ResultSummary struct {
+	MostCommonEmotion   string   `json:"most_common_emotion"`
+	EmotionVariability  string   `json:"emotion_variability"`
+	OverallTrend        string   `json:"overall_trend"`
+	NotableObservations []string `json:"notable_observations"`
+}

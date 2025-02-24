@@ -59,4 +59,14 @@ type UserRepository interface {
 type EvaluationRepository interface {
 	AddVoiceEvaluation(voiceEvaluation model.VoiceEvaluation) (string, error)
 	GetVoiceEvaluationById(evaluationId string) (*model.VoiceEvaluation, error)
+	GetVideoEvaluationById(evaluationId string) (*model.Emotion, error)
+	AddVideoEvaluation(videoEvaluation model.Emotion) (string, error)
+}
+
+type TestRepository interface {
+	StoreTestSession(sessionId string, sectionId string) error
+	StoreQuestionResult(sessionId string, sectionId string, testEval *model.TestAnswerEval) error
+	GetTestSession(sessionId string, sectionId string) (*model.TestSession, error)
+	GetAllQuestionResults(sessionId string, sectionId string) ([]model.TestAnswerEval, error)
+	ClearTestSession(sessionId string, sectionId string) error
 }

@@ -4,6 +4,7 @@ import (
 	"github.com/Harshal5167/Dapple-backend/internal/dto/request"
 	"github.com/Harshal5167/Dapple-backend/internal/dto/response"
 	"github.com/Harshal5167/Dapple-backend/internal/model"
+	"github.com/gofiber/contrib/socketio"
 )
 
 type AuthService interface {
@@ -21,6 +22,7 @@ type SectionService interface {
 	GetSectionData(userId string, sectionId string) (*response.SectionData, error)
 	AddCompleteSection(section *request.SectionData, levelId string) error
 	UpdateSectionProgress(userId string, lessonId string) error
+	GetTestData(sectionId string) (*response.SectionData, error)
 }
 
 type QuestionService interface {
@@ -42,6 +44,7 @@ type GeminiService interface {
 	GenerateUserCourse(user model.User, levelDetails []map[string]string) (*response.LevelsForUser, error)
 	EvaluateUserAnswer(user *model.User, question *model.Question, userAnswer []string) (*model.UserAnswerEvalutaion, error)
 	FormatVoiceEvaluationResponse(obtainedVoiceEvaluation *response.VoiceEvaluation, desiredVoiceEvaluation *model.VoiceEvaluation) (*model.UserAnswerEvalutaion, error)
+	EvaluateTestAnswer(Answer string, question *model.Question, obtainedVideoEvaluation *response.QuestionResult, desiredVideoEvaluation *model.Emotion) (*model.TestAnswerEval, error)
 }
 
 type UserService interface {
@@ -52,4 +55,14 @@ type EvaluationService interface {
 	EvaluateSubjectiveAnswer(userId string, req *request.EvaluateSubjectiveAnswerReq) (*response.EvaluateSubjectiveAnswerResponse, error)
 	EvaluateObjectiveAnswer(userId string, req *request.EvaluateObjectiveAnswerReq) (*response.EvaluateObjectiveAnswerResponse, error)
 	EvaluateVoiceAnswer(userId string, req *request.EvaluateVoiceAnswerReq, buf []byte) (*response.EvaluateVoiceAnswerResponse, error)
+}
+
+type SocketService interface {
+	HandleConnection(kws *socketio.Websocket)
+}
+
+type TestService interface {
+	EvaluateTestAnswer(message *request.TestData) (bool, error)
+	EvaluateImageAnswer(message *request.TestData) error
+	GetTestResult(userId string, sessionId string, sectionId string) (*response.TestResultResponse, error)
 }

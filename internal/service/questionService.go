@@ -46,8 +46,13 @@ func (s *QuestionService) AddQuestion(req *request.AddQuestionRequest) (*respons
 	}
 
 	var evaluationId string
-	if req.Type == "voice" {
+	if req.Type == model.Voice {
 		evaluationId, err = s.evaluationRepo.AddVoiceEvaluation(req.VoiceEvaluation)
+		if err != nil {
+			return nil, err
+		}
+	} else if req.Type == model.Test {
+		evaluationId, err = s.evaluationRepo.AddVideoEvaluation(req.VideoEvaluation)
 		if err != nil {
 			return nil, err
 		}
@@ -66,7 +71,7 @@ func (s *QuestionService) AddQuestion(req *request.AddQuestionRequest) (*respons
 		Explanation:   req.Explanation,
 	}
 
-	if req.Type == "voice" {
+	if req.Type == model.Voice || req.Type == model.Test {
 		question.EvaluationId = evaluationId
 	}
 

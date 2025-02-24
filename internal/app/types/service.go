@@ -11,4 +11,7 @@ type Services struct {
 	LessonService     interfaces.LessonService
 	UserCourseService interfaces.UserCourseService
 	EvaluationService interfaces.EvaluationService
+	UserService       interfaces.UserService
+	SocketService     interfaces.SocketService
+	TestService       interfaces.TestService
 }
