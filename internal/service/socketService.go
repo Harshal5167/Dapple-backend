@@ -23,6 +23,25 @@ func (s *SocketService) HandleConnection(kws *socketio.Websocket) {
 	socketio.On(socketio.EventMessage, s.handleMessage)
 	socketio.On(socketio.EventDisconnect, s.handleDisconnect)
 	socketio.On(socketio.EventClose, s.handleClose)
+	socketio.On("retry", s.handleRetry)
+}
+
+func (s *SocketService) handleRetry(ep *socketio.EventPayload) {
+	var message = &request.TestData{}
+
+	err := json.Unmarshal(ep.Data, &message)
+	if err != nil {
+		ep.Kws.Emit([]byte(`{"status": "error", "message": "Invalid JSON"}`), socketio.TextMessage)
+		return
+	}
+
+	err = s.testService.RetryQuestion(message.SessionId, message.QuestionId)
+	if err != nil {
+		ep.Kws.Emit([]byte(`{"status": "error", "message": "Error clearing question frames"}`), socketio.TextMessage)
+		return
+	}
+
+	ep.Kws.Emit([]byte(`{"status": "success", "message": "cleared question frames"}`), socketio.TextMessage)
 }
 
 func (s *SocketService) handleConnect(ep *socketio.EventPayload) {

@@ -65,4 +65,5 @@ type TestService interface {
 	EvaluateTestAnswer(message *request.TestData) (bool, error)
 	EvaluateImageAnswer(message *request.TestData) error
 	GetTestResult(userId string, sessionId string, sectionId string) (*response.TestResultResponse, error)
+	RetryQuestion(sessionId string, questionId string) error
 }

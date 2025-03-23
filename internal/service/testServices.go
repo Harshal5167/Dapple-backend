@@ -137,3 +137,11 @@ func (s *TestService) GetTestResult(userId string, sessionId string, sectionId s
 
 	return testResultResponse, nil
 }
+
+func ( s *TestService) RetryQuestion(sessionId string, questionId string) error {
+	err := videoEvaluation.ClearQuestionFrames(sessionId, questionId)
+	if err != nil {
+		return err
+	}
+	return nil
+}
