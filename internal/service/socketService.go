@@ -23,25 +23,6 @@ func (s *SocketService) HandleConnection(kws *socketio.Websocket) {
 	socketio.On(socketio.EventMessage, s.handleMessage)
 	socketio.On(socketio.EventDisconnect, s.handleDisconnect)
 	socketio.On(socketio.EventClose, s.handleClose)
-	socketio.On("retry", s.handleRetry)
-}
-
-func (s *SocketService) handleRetry(ep *socketio.EventPayload) {
-	var message = &request.TestData{}
-
-	err := json.Unmarshal(ep.Data, &message)
-	if err != nil {
-		ep.Kws.Emit([]byte(`{"status": "error", "message": "Invalid JSON"}`), socketio.TextMessage)
-		return
-	}
-
-	err = s.testService.RetryQuestion(message.SessionId, message.QuestionId)
-	if err != nil {
-		ep.Kws.Emit([]byte(`{"status": "error", "message": "Error clearing question frames"}`), socketio.TextMessage)
-		return
-	}
-
-	ep.Kws.Emit([]byte(`{"status": "success", "message": "cleared question frames"}`), socketio.TextMessage)
 }
 
 func (s *SocketService) handleConnect(ep *socketio.EventPayload) {
@@ -56,9 +37,9 @@ func (s *SocketService) handleMessage(ep *socketio.EventPayload) {
 		ep.Kws.Emit([]byte(`{"status": "error", "message": "Invalid JSON"}`), socketio.TextMessage)
 		return
 	}
-	ep.Kws.Emit([]byte(`{"status": "success", "message": "Data received"}`), socketio.TextMessage)
 
 	if message.Event == string(request.Image) {
+		ep.Kws.Emit([]byte(`{"status": "success", "message": "Data received"}`), socketio.TextMessage)
 		err = s.testService.EvaluateImageAnswer(message)
 		if err != nil {
 			ep.Kws.Emit([]byte(`{"status": "error", "message": "Error evaluating image"}`), socketio.TextMessage)
@@ -67,6 +48,7 @@ func (s *SocketService) handleMessage(ep *socketio.EventPayload) {
 	}
 
 	if message.Event == string(request.Text) {
+		ep.Kws.Emit([]byte(`{"status": "success", "message": "Data received"}`), socketio.TextMessage)
 		isEnd, err := s.testService.EvaluateTestAnswer(message)
 		if err != nil {
 			ep.Kws.Emit([]byte(`{"status": "error", "message": "Error evaluating text"}`), socketio.TextMessage)
@@ -77,6 +59,15 @@ func (s *SocketService) handleMessage(ep *socketio.EventPayload) {
 			ep.Kws.Close()
 			return
 		}
+	}
+
+	if message.Event == string(request.Retry) {
+		err = s.testService.RetryQuestion(message.SessionId, message.QuestionId)
+		if err != nil {
+			ep.Kws.Emit([]byte(`{"status": "error", "message": "Error clearing question frames"}`), socketio.TextMessage)
+			return
+		}
+		ep.Kws.Emit([]byte(`{"status": "success", "message": "cleared question frames"}`), socketio.TextMessage)
 	}
 }
 
