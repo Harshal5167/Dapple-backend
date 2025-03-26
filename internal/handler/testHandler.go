@@ -30,16 +30,20 @@ func (h *TestHandler) GetTestResult(c *fiber.Ctx) error {
 		})
 	}
 
-	userId, ok := c.Locals("userId").(string)
-	if !ok {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "userId is required",
-		})
-	}
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"sessionId": sessionId,
+		"sectionId": sectionId,
+	})
+	// userId, ok := c.Locals("userId").(string)
+	// if !ok {
+	// 	return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+	// 		"error": "userId is required",
+	// 	})
+	// }
 
-	result, err := h.testService.GetTestResult(userId, sessionId, sectionId)
-	if err != nil {
-		return err
-	}
-	return c.Status(fiber.StatusOK).JSON(result)
+	// result, err := h.testService.GetTestResult(userId, sessionId, sectionId)
+	// if err != nil {
+	// 	return err
+	// }
+	// return c.Status(fiber.StatusOK).JSON(result)
 }
