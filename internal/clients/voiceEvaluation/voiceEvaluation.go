@@ -26,11 +26,13 @@ func VoiceEvaluation(buf []byte) (*response.VoiceEvaluation, error) {
 	agent.Request().SetRequestURI(fmt.Sprintf("%s/analyze", api))
 
 	if err := agent.Parse(); err != nil {
+		fmt.Println("Error:", err)
 		return nil, fmt.Errorf("failed to parse request: %w", err)
 	}
 
 	statusCode, body, err := agent.Bytes()
 	if err != nil {
+		fmt.Println("Error:", err)
 		return nil, fmt.Errorf("request failed: %w", err[0])
 	}
 
@@ -40,6 +42,7 @@ func VoiceEvaluation(buf []byte) (*response.VoiceEvaluation, error) {
 
 	var voiceEvaluation response.VoiceEvaluation
 	if err := json.Unmarshal(body, &voiceEvaluation); err != nil {
+		fmt.Println("Error:", err)
 		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
 	}
 

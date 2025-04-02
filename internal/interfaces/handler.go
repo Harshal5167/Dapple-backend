@@ -50,3 +50,9 @@ type SocketHandler interface {
 type TestHandler interface {
 	GetTestResult(c *fiber.Ctx) error
 }
+
+type ExpertHandler interface {
+	AddExpert(c *fiber.Ctx) error
+	GetExpertById(c *fiber.Ctx) error
+	GetAllExperts(c *fiber.Ctx) error
+}

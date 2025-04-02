@@ -116,3 +116,11 @@ func (s *UserCourseService) UpdateUserProgress(userId string, sectionId string, 
 
 	return nil
 }
+
+func (s *UserCourseService) GetUserProgress(userId string) (*model.UserProgress, error) {
+	userProgress, err := s.userCourseRepo.GetUserProgress(userId)
+	if err != nil {
+		return nil, err
+	}
+	return userProgress, nil
+}

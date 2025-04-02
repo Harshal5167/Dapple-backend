@@ -13,4 +13,5 @@ type Handler struct {
 	UserHandler       interfaces.UserHandler
 	SocketHandler     interfaces.SocketHandler
 	TestHandler       interfaces.TestHandler
+	ExpertHandler     interfaces.ExpertHandler
 }

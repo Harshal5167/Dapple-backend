@@ -38,6 +38,7 @@ type UserCourseService interface {
 	TailorUserCourse(userId string, user model.User) error
 	GetUserCourse(userId string) (*response.UserCourseResponse, error)
 	UpdateUserProgress(userId string, sectionId string, xp int) error
+	GetUserProgress(userId string) (*model.UserProgress, error)
 }
 
 type GeminiService interface {
@@ -66,4 +67,10 @@ type TestService interface {
 	EvaluateImageAnswer(message *request.TestData) error
 	GetTestResult(userId string, sessionId string, sectionId string) (*response.TestResultResponse, error)
 	RetryQuestion(sessionId string, questionId string) error
+}
+
+type ExpertService interface {
+	AddExpert(req *request.AddExpertRequest) (*response.AddExpertResponse, error)
+	GetExpertById(expertId string) (*response.GetExpertResponse, error)
+	GetAllExperts() ([]*response.GetExpertResponse, error)
 }

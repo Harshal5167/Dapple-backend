@@ -46,6 +46,7 @@ type UserCourseRepository interface {
 	AddUserCourse(userId string, levelsForUser *response.LevelsForUser) error
 	GetUserCourse(userId string) (*model.UserCourse, error)
 	UpdateUserProgress(userId string, levelInc bool) error
+	GetUserProgress(userId string) (*model.UserProgress, error)
 }
 
 type UserRepository interface {
@@ -69,4 +70,13 @@ type TestRepository interface {
 	GetTestSession(sessionId string, sectionId string) (*model.TestSession, error)
 	GetAllQuestionResults(sessionId string, sectionId string) ([]model.TestAnswerEval, error)
 	ClearTestSession(sessionId string, sectionId string) error
+}
+
+type ExpertRepository interface {
+	AddExpert(expert *model.Expert) (string, error)
+	GetExpertById(expertId string) (*model.Expert, error)
+	GetAllExperts() (map[string]*model.Expert, error)
+	AddTimeSlot(timeSlot *model.TimeSlot) (string, error)
+	GetTimeSlotById(timeSlotId string) (*model.TimeSlot, error)
+	UpdateExpert(expertId string, schedule []*model.Schedule) error
 }

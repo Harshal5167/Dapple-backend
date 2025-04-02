@@ -66,4 +66,8 @@ func (a *App) InitializeServices() {
 	a.Services.SocketService = service.NewSocketService(
 		a.Services.TestService,
 	)
+	a.Services.ExpertService = service.NewExpertService(
+		a.Repositories.ExpertRepo,
+	)
+
 }

@@ -65,3 +65,14 @@ func (c *UserCourseRepository) UpdateUserProgress(userId string, levelInc bool) 
 	}
 	return nil
 }
+
+func (c *UserCourseRepository) GetUserProgress(userId string) (*model.UserProgress, error) {
+	ctx := context.Background()
+
+	ref := c.firebaseDB.NewRef("userCourses").Child(userId).Child("userProgress")
+	var userProgress model.UserProgress
+	if err := ref.Get(ctx, &userProgress); err != nil {
+		return nil, err
+	}
+	return &userProgress, nil
+}

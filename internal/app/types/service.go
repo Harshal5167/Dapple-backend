@@ -14,4 +14,5 @@ type Services struct {
 	UserService       interfaces.UserService
 	SocketService     interfaces.SocketService
 	TestService       interfaces.TestService
+	ExpertService     interfaces.ExpertService
 }

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/Harshal5167/Dapple-backend/config"
@@ -108,11 +109,19 @@ func (s *EvaluationService) EvaluateVoiceAnswer(userId string, req *request.Eval
 			XP:         xpGained,
 		}, nil
 	}
+	totalTimeTaken = totalTimeTaken / 1000
+	fmt.Println("Total time taken:", totalTimeTaken)
+	userProgress, err := s.userCourseService.GetUserProgress(userId)
+	if err != nil {
+		return nil, err
+	}
 	return &response.EvaluateVoiceAnswerResponse{
-		Evaluation:     formattedResponse.Evaluation,
-		XP:             xpGained,
-		TotalXP:        totalXP,
-		TotalTimeTaken: int64(totalTimeTaken),
+		Evaluation:        formattedResponse.Evaluation,
+		XP:                xpGained,
+		TotalXP:           totalXP,
+		TotalTimeTaken:    int64(totalTimeTaken),
+		CompletedSections: userProgress.CompletedSections,
+		CompletedLevels:   userProgress.CompletedLevels,
 	}, nil
 }
 
@@ -155,12 +164,21 @@ func (s *EvaluationService) EvaluateObjectiveAnswer(userId string, req *request.
 			XP:            xp,
 		}, nil
 	}
+
+	totalTimeTaken = totalTimeTaken / 1000
+	fmt.Println("Total time taken:", totalTimeTaken)
+	userProgress, err := s.userCourseService.GetUserProgress(userId)
+	if err != nil {
+		return nil, err
+	}
 	return &response.EvaluateObjectiveAnswerResponse{
-		CorrectOption:  question.CorrectOption - 1,
-		Explanation:    question.Explanation,
-		XP:             xp,
-		TotalXP:        totalXP,
-		TotalTimeTaken: int64(totalTimeTaken),
+		CorrectOption:     question.CorrectOption - 1,
+		Explanation:       question.Explanation,
+		XP:                xp,
+		TotalXP:           totalXP,
+		TotalTimeTaken:    int64(totalTimeTaken),
+		CompletedSections: userProgress.CompletedSections,
+		CompletedLevels:   userProgress.CompletedLevels,
 	}, nil
 }
 
@@ -210,12 +228,20 @@ func (s *EvaluationService) EvaluateSubjectiveAnswer(userId string, req *request
 			XP:         userAnswerEvaluation.XPGained,
 		}, nil
 	}
+	totalTimeTaken = totalTimeTaken / 1000
+	fmt.Println("Total time taken:", totalTimeTaken)
+	userProgress, err := s.userCourseService.GetUserProgress(userId)
+	if err != nil {
+		return nil, err
+	}
 	return &response.EvaluateSubjectiveAnswerResponse{
-		Evaluation:     userAnswerEvaluation.Evaluation,
-		BestAnswer:     question.BestAnswer,
-		UserAnswer:     req.UserAnswer,
-		XP:             userAnswerEvaluation.XPGained,
-		TotalXP:        totalXP,
-		TotalTimeTaken: int64(totalTimeTaken),
+		Evaluation:        userAnswerEvaluation.Evaluation,
+		BestAnswer:        question.BestAnswer,
+		UserAnswer:        req.UserAnswer,
+		XP:                userAnswerEvaluation.XPGained,
+		TotalXP:           totalXP,
+		TotalTimeTaken:    int64(totalTimeTaken),
+		CompletedSections: userProgress.CompletedSections,
+		CompletedLevels:   userProgress.CompletedLevels,
 	}, nil
 }

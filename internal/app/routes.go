@@ -14,4 +14,5 @@ func (a *App) InitializeRoutes() {
 	routes.NewUserRoute(a.Handler.UserHandler).UserRoutes(a.Fiber)
 	routes.NewSocketRoutes(a.Handler.SocketHandler).SetupRoutes(a.Fiber)
 	routes.NewTestRoutes(a.Handler.TestHandler).TestRoutes(a.Fiber)
+	routes.NewExpertRoutes(a.Handler.ExpertHandler).ExpertRoutes(a.Fiber)
 }

@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/Harshal5167/Dapple-backend/internal/dto/request"
 	"github.com/Harshal5167/Dapple-backend/internal/interfaces"
@@ -26,6 +27,7 @@ func (s *SocketService) HandleConnection(kws *socketio.Websocket) {
 }
 
 func (s *SocketService) handleConnect(ep *socketio.EventPayload) {
+	fmt.Println("Connected to socket")
 	ep.Kws.Emit([]byte(`{"status": "success", "message": "Connected"}`), socketio.TextMessage)
 }
 
@@ -38,6 +40,7 @@ func (s *SocketService) handleMessage(ep *socketio.EventPayload) {
 		return
 	}
 
+	print("Received message: ", message.Event, message.SessionId, message.QuestionId)
 	if message.Event == string(request.Image) {
 		ep.Kws.Emit([]byte(`{"status": "success", "message": "Data received"}`), socketio.TextMessage)
 		err = s.testService.EvaluateImageAnswer(message)
@@ -72,9 +75,11 @@ func (s *SocketService) handleMessage(ep *socketio.EventPayload) {
 }
 
 func (s *SocketService) handleDisconnect(ep *socketio.EventPayload) {
+	fmt.Println("Disconnected from socket")
 	ep.Kws.Emit([]byte(`{"status": "success", "message": "Disconnected"}`))
 }
 
 func (s *SocketService) handleClose(ep *socketio.EventPayload) {
+	fmt.Println("Closed socket connection")
 	ep.Kws.Emit([]byte(`{"status": "success", "message": "Connection Closed"}`))
 }

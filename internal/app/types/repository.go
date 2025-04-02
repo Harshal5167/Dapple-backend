@@ -12,4 +12,6 @@ type Repositories struct {
 	UserRepo       interfaces.UserRepository
 	EvaluationRepo interfaces.EvaluationRepository
 	TestRepo       interfaces.TestRepository
+	ExpertRepo     interfaces.ExpertRepository
+	
 }

@@ -34,3 +34,5 @@ dist/
 
 # Ignore json files
 *.json
+
+readme.md
