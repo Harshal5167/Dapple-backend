@@ -16,6 +16,6 @@ func NewUserRoute(handler interfaces.UserHandler) *UserRoute {
 
 func (r *UserRoute) UserRoutes(app *fiber.App) {
 	api := app.Group("/api")
-	auth := api.Group("/user", middleware.IsAuth)
-	auth.Post("/xp", r.handler.GetXP)
+	user := api.Group("/user", middleware.IsAuth)
+	user.Get("/xp", middleware.IsAuth, r.handler.GetXP)
 }

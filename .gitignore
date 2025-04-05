@@ -35,7 +35,6 @@ dist/
 # Ignore json files
 *.json
 
-readme.md
 
 temp.go
 temp2.go

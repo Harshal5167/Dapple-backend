@@ -89,5 +89,7 @@ func (h *ExpertHandler) GetAllExperts(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.Status(fiber.StatusOK).JSON(resp)
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"data": resp,
+	})
 }

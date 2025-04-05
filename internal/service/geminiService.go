@@ -48,10 +48,6 @@ func (s *geminiService) GenerateUserCourse(user model.User, levelDetails []map[s
 		return nil, fmt.Errorf("parsing error: %v", err)
 	}
 
-	if len(response.SelectedLevelIds) != 1 {
-		return nil, fmt.Errorf("error generating levels for user")
-	}
-
 	return &response, nil
 }
 
