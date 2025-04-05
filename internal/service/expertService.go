@@ -109,6 +109,13 @@ func (s *ExpertService) GetExpertById(expertId string) (*response.GetExpertRespo
 	var schedules []request.Schedule
 
 	for _, schedule := range expert.Schedule {
+		// Skip past dates
+		scheduleDate := schedule.Date.In(loc)
+		scheduleDateOnly := time.Date(scheduleDate.Year(), scheduleDate.Month(), scheduleDate.Day(), 0, 0, 0, 0, loc)
+		if scheduleDateOnly.Before(todayDateOnly) {
+			continue
+		}
+
 		s := request.Schedule{
 			Date: schedule.Date,
 		}
@@ -121,8 +128,8 @@ func (s *ExpertService) GetExpertById(expertId string) (*response.GetExpertRespo
 
 			available := ts.Available
 
-			// if schedule is for today AND start time is before current time, mark as unavailable
-			if schedule.Date.Equal(todayDateOnly) && ts.StartTime.Before(now) {
+			// Mark time slots as unavailable if they are in the past today
+			if scheduleDateOnly.Equal(todayDateOnly) && ts.StartTime.Before(now) {
 				available = false
 			}
 
@@ -134,18 +141,22 @@ func (s *ExpertService) GetExpertById(expertId string) (*response.GetExpertRespo
 			})
 		}
 
-		schedules = append(schedules, s)
+		// Only add if there are valid timeslots remaining
+		if len(s.TimeSlots) > 0 {
+			schedules = append(schedules, s)
+		}
 	}
 
 	return &response.GetExpertResponse{
+		ExpertId:        expertId,
 		Name:            expert.Name,
 		ImageURL:        expert.ImageURL,
 		Bio:             expert.Bio,
 		XpRequired:      expert.XpRequired,
 		Rating:          expert.Rating,
 		Experience:      expert.Experience,
-		Schedule:        schedules,
 		PatientsTreated: expert.PatientsTreated,
+		Schedule:        schedules,
 	}, nil
 }
 
@@ -196,6 +207,13 @@ func (s *ExpertService) GetExpertSchedule(expertId string) (*response.GetExpertS
 	var schedules []request.Schedule
 
 	for _, schedule := range expert.Schedule {
+		// Skip past dates
+		scheduleDate := schedule.Date.In(loc)
+		scheduleDateOnly := time.Date(scheduleDate.Year(), scheduleDate.Month(), scheduleDate.Day(), 0, 0, 0, 0, loc)
+		if scheduleDateOnly.Before(todayDateOnly) {
+			continue
+		}
+
 		s := request.Schedule{
 			Date: schedule.Date,
 		}
@@ -208,8 +226,8 @@ func (s *ExpertService) GetExpertSchedule(expertId string) (*response.GetExpertS
 
 			available := ts.Available
 
-			// if schedule is for today AND start time is before current time, mark as unavailable
-			if schedule.Date.Equal(todayDateOnly) && ts.StartTime.Before(now) {
+			// Mark time slots as unavailable if they are in the past today
+			if scheduleDateOnly.Equal(todayDateOnly) && ts.StartTime.Before(now) {
 				available = false
 			}
 
@@ -221,7 +239,10 @@ func (s *ExpertService) GetExpertSchedule(expertId string) (*response.GetExpertS
 			})
 		}
 
-		schedules = append(schedules, s)
+		// Only add if there are valid timeslots remaining
+		if len(s.TimeSlots) > 0 {
+			schedules = append(schedules, s)
+		}
 	}
 
 	return &response.GetExpertScheduleResponse{
