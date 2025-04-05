@@ -19,5 +19,8 @@ func NewTestRoutes(testHandler interfaces.TestHandler) *TestRoutes {
 func (r *TestRoutes) TestRoutes(app *fiber.App) {
 	api := app.Group("/api")
 	test := api.Group("/test", middleware.IsAuth)
+	test.Post("/upload-image", r.testHandler.UploadImage)
+	test.Post("/upload-text", r.testHandler.UploadText)
+	test.Get("/retry", r.testHandler.RetryQuestion)
 	test.Get("/result", r.testHandler.GetTestResult)
 }

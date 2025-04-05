@@ -11,7 +11,6 @@ const (
 type TestData struct {
 	QuestionId string `json:"questionId"`
 	SessionId  string `json:"sessionId"`
-	Event      string `json:"event"`
-	ImageUrl   string `json:"imageUrl"`
-	Answer     string `json:"answer"`
+	ImageUrl   string `json:"imageUrl,omitempty"`
+	Answer     string `json:"answer,omitempty"`
 }

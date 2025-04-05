@@ -36,3 +36,8 @@ dist/
 *.json
 
 readme.md
+
+temp.go
+temp2.go
+
+/images

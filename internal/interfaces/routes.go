@@ -33,3 +33,7 @@ type UserRoutes interface {
 type TestRoutes interface {
 	TestRoutes(app *fiber.App)
 }
+
+type AppointmentRoutes interface {
+	AppointmentRoutes(app *fiber.App)
+}

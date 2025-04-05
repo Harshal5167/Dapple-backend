@@ -63,11 +63,16 @@ func (a *App) InitializeServices() {
 		a.Repositories.EvaluationRepo,
 		a.Services.UserCourseService,
 	)
-	a.Services.SocketService = service.NewSocketService(
-		a.Services.TestService,
-	)
+	// a.Services.SocketService = service.NewSocketService(
+	// 	a.Services.TestService,
+	// )
 	a.Services.ExpertService = service.NewExpertService(
 		a.Repositories.ExpertRepo,
+		a.Repositories.AppointmentRepo,
 	)
-
+	a.Services.AppointmentService = service.NewAppointmentService(
+		a.Repositories.AppointmentRepo,
+		a.Repositories.UserRepo,
+		a.Repositories.ExpertRepo,
+	)
 }

@@ -73,4 +73,11 @@ type ExpertService interface {
 	AddExpert(req *request.AddExpertRequest) (*response.AddExpertResponse, error)
 	GetExpertById(expertId string) (*response.GetExpertResponse, error)
 	GetAllExperts() ([]*response.GetExpertResponse, error)
+	GetExpertSchedule(expertId string) (*response.GetExpertScheduleResponse, error)
+}
+
+type AppointmentService interface {
+	CreateAppointment(timeSlotId string, userId string) (*response.CreateAppointmentResponse, error)
+	GetAllAppointments(userId string) ([]response.GetAllAppointmentsResponse, error)
+	GetAppointmentById(appointmentId string) (*response.GetAppointmentByIdResponse, error)
 }

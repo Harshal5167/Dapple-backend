@@ -15,7 +15,7 @@ func EndSession(sessionId string) error {
 	req := agent.Request()
 	req.Header.SetMethod(fiber.MethodPost)
 	args := fiber.AcquireArgs()
-	args.Set("sessionId", sessionId)
+	args.Set("session_id", sessionId)
 
 	api := config.ImageModelAPI
 	agent.Request().SetRequestURI(fmt.Sprintf("%s/end_session", api))

@@ -14,7 +14,8 @@ func (a *App) InitializeHandlers() {
 	a.Handler.UserCourseHandler = handler.NewUserCourseHandler(a.Services.UserCourseService)
 	a.Handler.EvaluationHandler = handler.NewEvaluationHandler(a.Services.EvaluationService, a.Services.QuestionService)
 	a.Handler.UserHandler = handler.NewUserHandler(a.Services.UserService)
-	a.Handler.SocketHandler = handler.NewSocketHandler(a.Services.SocketService)
+	// a.Handler.SocketHandler = handler.NewSocketHandler(a.Services.SocketService)
 	a.Handler.TestHandler = handler.NewTestHandler(a.Services.TestService)
 	a.Handler.ExpertHandler = handler.NewExpertHandler(a.Services.ExpertService)
+	a.Handler.AppointmentHandler = handler.NewAppointmentHandler(a.Services.AppointmentService,)
 }

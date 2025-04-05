@@ -49,10 +49,20 @@ type SocketHandler interface {
 
 type TestHandler interface {
 	GetTestResult(c *fiber.Ctx) error
+	UploadImage(c *fiber.Ctx) error
+	UploadText(c *fiber.Ctx) error
+	RetryQuestion(c *fiber.Ctx) error
 }
 
 type ExpertHandler interface {
 	AddExpert(c *fiber.Ctx) error
 	GetExpertById(c *fiber.Ctx) error
 	GetAllExperts(c *fiber.Ctx) error
+	GetExpertSchedule(c *fiber.Ctx) error
+}
+
+type AppointmentHandler interface {
+	CreateAppointment(c *fiber.Ctx) error
+	GetAllAppointments(c *fiber.Ctx) error
+	GetAppointmentByID(c *fiber.Ctx) error
 }

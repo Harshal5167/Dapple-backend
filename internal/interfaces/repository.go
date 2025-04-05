@@ -76,7 +76,15 @@ type ExpertRepository interface {
 	AddExpert(expert *model.Expert) (string, error)
 	GetExpertById(expertId string) (*model.Expert, error)
 	GetAllExperts() (map[string]*model.Expert, error)
+	UpdateExpert(expertId string, schedule []model.Schedule) error
+}
+
+type AppointmentRepository interface {
 	AddTimeSlot(timeSlot *model.TimeSlot) (string, error)
 	GetTimeSlotById(timeSlotId string) (*model.TimeSlot, error)
-	UpdateExpert(expertId string, schedule []*model.Schedule) error
+	GetTimeSlotsByExpertId(expertId string) ([]*model.TimeSlot, error)
+	CreateAppointment(appointment *model.Appointment) (string, error)
+	UpdateTimeSlotAvailability(timeSlotId string, available bool) error
+	GetAllAppointments(userId string) (map[string]model.Appointment, error)
+	GetAppointmentById(appointmentId string) (*model.Appointment, error)
 }

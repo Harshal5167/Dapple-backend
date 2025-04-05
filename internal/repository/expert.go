@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 
 	"firebase.google.com/go/v4/db"
 	"github.com/Harshal5167/Dapple-backend/internal/model"
@@ -19,11 +20,13 @@ func NewExpertRepository(db *db.Client) *ExpertRepository {
 
 func (r *ExpertRepository) AddExpert(expert *model.Expert) (string, error) {
 	ctx := context.Background()
+	fmt.Println("Adding expert to Firebase DB:")
 
 	ref, err := r.firebaseDB.NewRef("experts").Push(ctx, expert)
 	if err != nil {
 		return "", err
 	}
+	fmt.Println("Expert added with ID:", ref.Key)
 
 	return ref.Key, nil
 }
@@ -50,18 +53,7 @@ func (r *ExpertRepository) GetAllExperts() (map[string]*model.Expert, error) {
 	return experts, nil
 }
 
-func (r *ExpertRepository) AddTimeSlot(timeSlot *model.TimeSlot) (string, error) {
-	ctx := context.Background()
-
-	ref, err := r.firebaseDB.NewRef("time-slots").Push(ctx, timeSlot)
-	if err != nil {
-		return "", err
-	}
-
-	return ref.Key, nil
-}
-
-func (r *ExpertRepository) UpdateExpert(expertId string, schedule []*model.Schedule) error {
+func (r *ExpertRepository) UpdateExpert(expertId string, schedule []model.Schedule) error {
 	ctx := context.Background()
 
 	if err := r.firebaseDB.NewRef("experts/"+expertId+"/schedule").Set(ctx, schedule); err != nil {
@@ -69,15 +61,4 @@ func (r *ExpertRepository) UpdateExpert(expertId string, schedule []*model.Sched
 	}
 
 	return nil
-}
-
-func (r *ExpertRepository) GetTimeSlotById(timeSlotId string) (*model.TimeSlot, error) {
-	ctx := context.Background()
-
-	var timeSlot model.TimeSlot
-	if err := r.firebaseDB.NewRef("time-slots/"+timeSlotId).Get(ctx, &timeSlot); err != nil {
-		return nil, err
-	}
-
-	return &timeSlot, nil
 }

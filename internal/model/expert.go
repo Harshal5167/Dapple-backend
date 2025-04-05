@@ -1,23 +1,20 @@
 package model
 
+import "time"
+
 type Expert struct {
-	Name       string     `json:"name"`
-	ImageURL   string     `json:"imageUrl"`
-	Bio        string     `json:"bio"`
-	Schedule   []Schedule `json:"schedule,omitEmpty"`
-	XpRequired int        `json:"xpRequired"`
-	Rating     float64    `json:"rating"`
+	Name            string     `json:"name"`
+	Email           string     `json:"email"`
+	Experience      string     `json:"experience"`
+	PatientsTreated string     `json:"patientsTreated"`
+	ImageURL        string     `json:"imageUrl,omitempty"`
+	Bio             string     `json:"bio"`
+	Schedule        []Schedule `json:"schedule,omitempty"`
+	XpRequired      int        `json:"xpRequired"`
+	Rating          float64    `json:"rating"`
 }
 
 type Schedule struct {
-	Date        string   `json:"date"`
-	TimeSlotIds []string `json:"timeSlotIds"`
-}
-
-type TimeSlot struct {
-	ExpertId  string `json:"expertId"`
-	Date      string `json:"date"`
-	StartTime string `json:"startTime"`
-	EndTime   string `json:"endTime"`
-	Available bool   `json:"available"`
+	Date        time.Time `json:"date"`
+	TimeSlotIds []string  `json:"timeSlotIds"`
 }

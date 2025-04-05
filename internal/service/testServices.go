@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/base64"
+	"fmt"
 	"math"
 	"time"
 
@@ -37,26 +38,27 @@ func NewTestService(geminiService interfaces.GeminiService,
 }
 
 func (s *TestService) EvaluateTestAnswer(message *request.TestData) (bool, error) {
+	fmt.Println("Evaluating test answer")
 	question, err := s.questionRepo.GetQuestionById(message.QuestionId)
 	if err != nil {
 		return false, err
 	}
-
+	fmt.Println("Evaluating test answer2")
 	evaluation, err := s.evaluationRepo.GetVideoEvaluationById(question.EvaluationId)
 	if err != nil {
 		return false, err
 	}
-
+	fmt.Println("Evaluating test answer3")
 	obtainedEvaluation, err := videoEvaluation.QuestionResult(message.QuestionId, message.SessionId)
 	if err != nil {
 		return false, err
 	}
-
+	fmt.Println("Evaluating test answer4")
 	testEval, err := s.geminiService.EvaluateTestAnswer(message.Answer, question, obtainedEvaluation, evaluation)
 	if err != nil {
 		return false, err
 	}
-
+	fmt.Println("Evaluating test answer5")
 	var totalXP int = 0
 	if evaluation.Emotion == obtainedEvaluation.AverageEmotion {
 		diff := math.Abs(evaluation.Confidence - obtainedEvaluation.AverageConfidence)
@@ -64,17 +66,19 @@ func (s *TestService) EvaluateTestAnswer(message *request.TestData) (bool, error
 		totalXP -= totalXP % 10
 		totalXP = max(totalXP, 30)
 	}
-
+	fmt.Println("Evaluating test answer6")
 	testEval.UserAnswerXP += totalXP
 	err = s.testRepo.StoreQuestionResult(message.SessionId, message.QuestionId, testEval)
 	if err != nil {
 		return false, err
 	}
+	fmt.Println("Storing question result")
 
 	questions, _, err := s.sectionRepo.GetQuestionsAndLessons(question.SectionId)
 	if err != nil {
 		return false, err
 	}
+	fmt.Println("Storing question result2")
 	if questions[len(questions)-1] == message.QuestionId {
 		err = videoEvaluation.EndSession(message.SessionId)
 		if err != nil {
@@ -138,7 +142,7 @@ func (s *TestService) GetTestResult(userId string, sessionId string, sectionId s
 	return testResultResponse, nil
 }
 
-func ( s *TestService) RetryQuestion(sessionId string, questionId string) error {
+func (s *TestService) RetryQuestion(sessionId string, questionId string) error {
 	err := videoEvaluation.ClearQuestionFrames(sessionId, questionId)
 	if err != nil {
 		return err

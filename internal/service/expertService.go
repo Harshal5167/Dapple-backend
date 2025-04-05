@@ -1,6 +1,8 @@
 package service
 
 import (
+	"time"
+
 	"github.com/Harshal5167/Dapple-backend/internal/dto/request"
 	"github.com/Harshal5167/Dapple-backend/internal/dto/response"
 	"github.com/Harshal5167/Dapple-backend/internal/interfaces"
@@ -8,20 +10,27 @@ import (
 )
 
 type ExpertService struct {
-	expertRepo interfaces.ExpertRepository
+	expertRepo      interfaces.ExpertRepository
+	appointmentRepo interfaces.AppointmentRepository
 }
 
-func NewExpertService(repo interfaces.ExpertRepository) *ExpertService {
-	return &ExpertService{expertRepo: repo}
+func NewExpertService(expertRepo interfaces.ExpertRepository, appointmentRepo interfaces.AppointmentRepository) *ExpertService {
+	return &ExpertService{
+		expertRepo:      expertRepo,
+		appointmentRepo: appointmentRepo,
+	}
 }
 
 func (s *ExpertService) AddExpert(req *request.AddExpertRequest) (*response.AddExpertResponse, error) {
 	expert := &model.Expert{
-		Name:       req.Name,
-		ImageURL:   req.ImageURL,
-		Bio:        req.Bio,
-		XpRequired: req.XpRequired,
-		Rating:     req.Rating,
+		Name:            req.Name,
+		ImageURL:        req.ImageURL,
+		Bio:             req.Bio,
+		XpRequired:      req.XpRequired,
+		Rating:          req.Rating,
+		Email:           req.Email,
+		Experience:      req.Experience,
+		PatientsTreated: req.PatientsTreated,
 	}
 
 	expertId, err := s.expertRepo.AddExpert(expert)
@@ -29,27 +38,46 @@ func (s *ExpertService) AddExpert(req *request.AddExpertRequest) (*response.AddE
 		return nil, err
 	}
 
+	loc, _ := time.LoadLocation("Asia/Kolkata")
+	today := time.Now().In(loc)
 	var schedules []model.Schedule
-	for _, schedule := range req.Schedule {
-		schedules = append(schedules, model.Schedule{
-			Date: schedule.Date,
-		})
+
+	slotStartHours := []int{10, 11, 12, 13, 14, 15, 16, 17}
+	slotStartMinutes := []int{30, 30, 30, 30, 30, 30, 30, 30}
+
+	for i := 0; i < 30; i++ {
+		currentDate := today.AddDate(0, 0, i)
+		dateOnly := time.Date(currentDate.Year(), currentDate.Month(), currentDate.Day(), 0, 0, 0, 0, loc)
+
 		var timeSlotIds []string
-		for _, timeSlot := range schedule.TimeSlots {
+		for j := 0; j < 8; j++ {
+			start := time.Date(currentDate.Year(), currentDate.Month(), currentDate.Day(), slotStartHours[j], slotStartMinutes[j], 0, 0, loc)
+			end := start.Add(1 * time.Hour)
+
 			ts := &model.TimeSlot{
 				ExpertId:  expertId,
-				Date:      schedule.Date,
-				StartTime: timeSlot.StartTime,
-				EndTime:   timeSlot.EndTime,
-				Available: timeSlot.Available,
+				Date:      dateOnly,
+				StartTime: start,
+				EndTime:   end,
+				Available: true,
 			}
-			timeSlotId, err := s.expertRepo.AddTimeSlot(ts)
+
+			timeSlotId, err := s.appointmentRepo.AddTimeSlot(ts)
 			if err != nil {
 				return nil, err
 			}
 			timeSlotIds = append(timeSlotIds, timeSlotId)
 		}
-		schedules[len(schedules)-1].TimeSlotIds = timeSlotIds
+
+		schedules = append(schedules, model.Schedule{
+			Date:        dateOnly,
+			TimeSlotIds: timeSlotIds,
+		})
+	}
+
+	err = s.expertRepo.UpdateExpert(expertId, schedules)
+	if err != nil {
+		return nil, err
 	}
 
 	return &response.AddExpertResponse{
@@ -63,33 +91,61 @@ func (s *ExpertService) GetExpertById(expertId string) (*response.GetExpertRespo
 		return nil, err
 	}
 
+	timeSlots, err := s.appointmentRepo.GetTimeSlotsByExpertId(expertId)
+	if err != nil {
+		return nil, err
+	}
+
+	loc := time.Now().Location()
+	now := time.Now().In(loc)
+	todayDateOnly := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, loc)
+
+	// Create a lookup map for timeSlots
+	slotMap := make(map[string]*model.TimeSlot)
+	for _, ts := range timeSlots {
+		slotMap[ts.Id] = ts
+	}
+
 	var schedules []request.Schedule
+
 	for _, schedule := range expert.Schedule {
-		schedules = append(schedules, request.Schedule{
+		s := request.Schedule{
 			Date: schedule.Date,
-		})
-		for _, timeSlotId := range schedule.TimeSlotIds {
-			timeSlot, err := s.expertRepo.GetTimeSlotById(timeSlotId)
-			if err != nil {
-				return nil, err
+		}
+
+		for _, tsId := range schedule.TimeSlotIds {
+			ts, ok := slotMap[tsId]
+			if !ok {
+				continue
 			}
-			schedules[len(schedules)-1].TimeSlots = append(schedules[len(schedules)-1].TimeSlots, request.TimeSlot{
-				ExpertId:   timeSlot.ExpertId,
-				TimeSlotId: timeSlotId,
-				StartTime:  timeSlot.StartTime,
-				EndTime:    timeSlot.EndTime,
-				Available:  timeSlot.Available,
+
+			available := ts.Available
+
+			// if schedule is for today AND start time is before current time, mark as unavailable
+			if schedule.Date.Equal(todayDateOnly) && ts.StartTime.Before(now) {
+				available = false
+			}
+
+			s.TimeSlots = append(s.TimeSlots, request.TimeSlot{
+				TimeSlotId: tsId,
+				StartTime:  ts.StartTime,
+				EndTime:    ts.EndTime,
+				Available:  available,
 			})
 		}
+
+		schedules = append(schedules, s)
 	}
 
 	return &response.GetExpertResponse{
-		Name:       expert.Name,
-		ImageURL:   expert.ImageURL,
-		Bio:        expert.Bio,
-		Schedule:   schedules,
-		XpRequired: expert.XpRequired,
-		Rating:     expert.Rating,
+		Name:            expert.Name,
+		ImageURL:        expert.ImageURL,
+		Bio:             expert.Bio,
+		XpRequired:      expert.XpRequired,
+		Rating:          expert.Rating,
+		Experience:      expert.Experience,
+		Schedule:        schedules,
+		PatientsTreated: expert.PatientsTreated,
 	}, nil
 }
 
@@ -102,14 +158,73 @@ func (s *ExpertService) GetAllExperts() ([]*response.GetExpertResponse, error) {
 	var resp []*response.GetExpertResponse
 	for key, expert := range experts {
 		resp = append(resp, &response.GetExpertResponse{
-			ExpertId:   key,
-			Name:       expert.Name,
-			ImageURL:   expert.ImageURL,
-			Bio:        expert.Bio,
-			XpRequired: expert.XpRequired,
-			Rating:     expert.Rating,
+			ExpertId:        key,
+			Name:            expert.Name,
+			ImageURL:        expert.ImageURL,
+			Bio:             expert.Bio,
+			XpRequired:      expert.XpRequired,
+			Rating:          expert.Rating,
+			Experience:      expert.Experience,
+			PatientsTreated: expert.PatientsTreated,
 		})
 	}
 
 	return resp, nil
+}
+
+func (s *ExpertService) GetExpertSchedule(expertId string) (*response.GetExpertScheduleResponse, error) {
+	expert, err := s.expertRepo.GetExpertById(expertId)
+	if err != nil {
+		return nil, err
+	}
+
+	timeSlots, err := s.appointmentRepo.GetTimeSlotsByExpertId(expertId)
+	if err != nil {
+		return nil, err
+	}
+
+	loc := time.Now().Location()
+	now := time.Now().In(loc)
+	todayDateOnly := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, loc)
+
+	// Create a lookup map for timeSlots
+	slotMap := make(map[string]*model.TimeSlot)
+	for _, ts := range timeSlots {
+		slotMap[ts.Id] = ts
+	}
+
+	var schedules []request.Schedule
+
+	for _, schedule := range expert.Schedule {
+		s := request.Schedule{
+			Date: schedule.Date,
+		}
+
+		for _, tsId := range schedule.TimeSlotIds {
+			ts, ok := slotMap[tsId]
+			if !ok {
+				continue
+			}
+
+			available := ts.Available
+
+			// if schedule is for today AND start time is before current time, mark as unavailable
+			if schedule.Date.Equal(todayDateOnly) && ts.StartTime.Before(now) {
+				available = false
+			}
+
+			s.TimeSlots = append(s.TimeSlots, request.TimeSlot{
+				TimeSlotId: tsId,
+				StartTime:  ts.StartTime,
+				EndTime:    ts.EndTime,
+				Available:  available,
+			})
+		}
+
+		schedules = append(schedules, s)
+	}
+
+	return &response.GetExpertScheduleResponse{
+		Schedule: schedules,
+	}, nil
 }

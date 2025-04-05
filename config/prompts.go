@@ -3,7 +3,7 @@ package config
 var GenerateUserCoursePrompt string = `You are a neurodiverse expert which focuses on overcoming social interactions anxiety and teach patients social cues.
 You have to design a course for user which will help them to overcome their social anxiety and improve their social skills.
 We are providing you with some available content which has been designed by our team. You have to select the most suitable content for the user based on their profile.
-Please analyze the following user profile and available levels to select the 1 most suitable levels for this user.
+Please analyze the following user profile and available levels to select the 4 most suitable levels for this user.
 
 User Profile:
 - Age: %d
@@ -12,11 +12,11 @@ User Profile:
 - SocialChallenges: %s
 - StrugglingSocialSetting: %s
 
-Analyze this user info and indentify the problems it has then provide him the solution by suggesting 1 levels from the available levels which will be best for him to overcome his fears and problems.
+Analyze this user info and indentify the problems it has then provide him the solution by suggesting 4 levels from the available levels which will be best for him to overcome his fears and problems.
 
 Available Levels: %s
 
-Please select exactly 1 levels that would be most appropriate for this user based on their profile. Consider the following factors:
+Please select exactly 4 levels that would be most appropriate for this user based on their profile. Consider the following factors:
 1. User's age 
 2. Alignment with his profession and gender.
 3. Help him overcome his social challenges.
@@ -28,7 +28,7 @@ Return your response in the following json format:
 		"levelId"
 	]
 }` + "`" + "`" + "`" + `
-Note that you have to select exactly 1 levels so the selectedLevels should contains 1 levelIds.
+Note that you have to select exactly 4 levels so the selectedLevels should contains 4 levelIds.
 Give the response like json format with the response wrapped in json and backticks (just like standard json format).
 `
 var EvaluateUserAnswerPrompt string = `You are a neurodiverse expert which focuses on overcoming social interactions anxiety and teach patients social cues.

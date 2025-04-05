@@ -12,7 +12,8 @@ func (a *App) InitializeRoutes() {
 	routes.NewLessonRoutes(a.Handler.LessonHandler).LessonRoutes(a.Fiber)
 	routes.NewUserCourseRoutes(a.Handler.UserCourseHandler).UserCourseRoutes(a.Fiber)
 	routes.NewUserRoute(a.Handler.UserHandler).UserRoutes(a.Fiber)
-	routes.NewSocketRoutes(a.Handler.SocketHandler).SetupRoutes(a.Fiber)
+	// routes.NewSocketRoutes(a.Handler.SocketHandler).SetupRoutes(a.Fiber)
 	routes.NewTestRoutes(a.Handler.TestHandler).TestRoutes(a.Fiber)
 	routes.NewExpertRoutes(a.Handler.ExpertHandler).ExpertRoutes(a.Fiber)
+	routes.NewAppointmentRoutes(a.Handler.AppointmentHandler).AppointmentRoutes(a.Fiber)
 }
