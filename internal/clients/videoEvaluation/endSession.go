@@ -1,7 +1,6 @@
 package videoEvaluation
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/Harshal5167/Dapple-backend/config"
@@ -14,17 +13,15 @@ func EndSession(sessionId string) error {
 
 	req := agent.Request()
 	req.Header.SetMethod(fiber.MethodPost)
-	args := fiber.AcquireArgs()
-	args.Set("session_id", sessionId)
 
 	api := config.ImageModelAPI
-	agent.Request().SetRequestURI(fmt.Sprintf("%s/end_session", api))
+	agent.Request().SetRequestURI(fmt.Sprintf("%s/end_session?session_id=%s", api, sessionId))
 
 	if err := agent.Parse(); err != nil {
 		return fmt.Errorf("failed to parse request: %w", err)
 	}
 
-	statusCode, body, err := agent.Bytes()
+	statusCode, _, err := agent.Bytes()
 	if err != nil {
 		return fmt.Errorf("request failed: %w", err[0])
 	}
@@ -33,14 +30,14 @@ func EndSession(sessionId string) error {
 		return fmt.Errorf("request failed")
 	}
 
-	var response map[string]string
-	if err := json.Unmarshal(body, &response); err != nil {
-		return fmt.Errorf("failed to unmarshal response: %w", err)
-	}
+	// var response map[string]string
+	// if err := json.Unmarshal(body, &response); err != nil {
+	// 	return fmt.Errorf("failed to unmarshal response: %w", err)
+	// }
 
-	if response["status"] != "success" {
-		return fmt.Errorf("failed to clear session")
-	}
+	// if response["status"] != "success" {
+	// 	return fmt.Errorf("failed to clear session")
+	// }
 
 	return nil
 }

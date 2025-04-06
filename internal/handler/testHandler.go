@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"fmt"
+
 	"github.com/Harshal5167/Dapple-backend/internal/dto/request"
 	"github.com/Harshal5167/Dapple-backend/internal/interfaces"
 	"github.com/gofiber/fiber/v2"
@@ -46,6 +48,8 @@ func (h *TestHandler) GetTestResult(c *fiber.Ctx) error {
 }
 
 func (h *TestHandler) UploadImage(c *fiber.Ctx) error {
+	fmt.Println("Uploading image")
+
 	var req *request.TestData
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -53,6 +57,7 @@ func (h *TestHandler) UploadImage(c *fiber.Ctx) error {
 		})
 	}
 
+	fmt.Println("llll")
 	if req.ImageUrl == "" || req.SessionId == "" || req.QuestionId == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Missing or wrong fields",

@@ -19,7 +19,7 @@ func QuestionResult(questionId string, sessionId string) (*response.QuestionResu
 	api := config.ImageModelAPI
 	agent.Request().SetRequestURI(fmt.Sprintf("%s/get_question_results?session_id=%s&question_id=%s", api, sessionId, questionId))
 
-	fmt.Println("Request URL:", req.RequestURI())
+	fmt.Println("Request URL:")
 	if err := agent.Parse(); err != nil {
 		return nil, fmt.Errorf("failed to parse request: %w", err)
 	}

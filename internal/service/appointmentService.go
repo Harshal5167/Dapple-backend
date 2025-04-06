@@ -32,6 +32,7 @@ func NewAppointmentService(appointmentRepository interfaces.AppointmentRepositor
 }
 
 func (s *AppointmentService) CreateAppointment(timeSlotId string, userId string) (*response.CreateAppointmentResponse, error) {
+	fmt.Println("Creating appointment...")
 	timeSlot, err := s.appointmentRepository.GetTimeSlotById(timeSlotId)
 	if err != nil {
 		return nil, err
@@ -154,6 +155,7 @@ func (s *AppointmentService) GetAllAppointments(userId string) ([]response.GetAl
 			ImageUrl:      expert.ImageURL,
 			Rating:        expert.Rating,
 			Date:          timeSlot.Date,
+			Bio:           expert.Bio,
 			StartTime:     timeSlot.StartTime,
 			EndTime:       timeSlot.EndTime,
 		})

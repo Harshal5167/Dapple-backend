@@ -134,6 +134,8 @@ func (s *geminiService) EvaluateTestAnswer(Answer string, question *model.Questi
 		return nil, fmt.Errorf("generate content error: %v", err)
 	}
 
+	fmt.Println("Gemini response:", jsonStr)
+
 	response := &model.TestAnswerEval{}
 	err = json.Unmarshal([]byte(jsonStr), response)
 	if err != nil {

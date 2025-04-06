@@ -134,10 +134,10 @@ func (s *TestService) GetTestResult(userId string, sessionId string, sectionId s
 		return nil, err
 	}
 
-	err = videoEvaluation.ClearSession(sessionId)
-	if err != nil {
-		return nil, err
-	}
+	// err = videoEvaluation.ClearSession(sessionId)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	return testResultResponse, nil
 }

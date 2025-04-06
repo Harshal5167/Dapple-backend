@@ -15,6 +15,7 @@ type GetAllAppointmentsResponse struct {
 	Date          time.Time `json:"date"`
 	StartTime     time.Time `json:"startTime"`
 	EndTime       time.Time `json:"endTime"`
+	Bio           string    `json:"bio"`
 }
 
 type GetAppointmentByIdResponse struct {
