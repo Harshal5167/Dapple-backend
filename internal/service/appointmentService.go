@@ -54,14 +54,6 @@ func (s *AppointmentService) CreateAppointment(timeSlotId string, userId string)
 	if !timeSlot.Available {
 		return nil, fmt.Errorf("time slot is not available")
 	}
-	err = s.userRepo.UpdateUserXP(userId, (expert.XpRequired * (-1)))
-	if err != nil {
-		return nil, err
-	}
-	err = s.appointmentRepository.UpdateTimeSlotAvailability(timeSlotId, false)
-	if err != nil {
-		return nil, err
-	}
 
 	b, err := os.ReadFile("config\\google-cloud-oauth2-credentials.json")
 	if err != nil {
@@ -121,6 +113,14 @@ func (s *AppointmentService) CreateAppointment(timeSlotId string, userId string)
 		ExpertID:           timeSlot.ExpertId,
 		GoogleCalendarLink: event.HtmlLink,
 	})
+	if err != nil {
+		return nil, err
+	}
+	err = s.userRepo.UpdateUserXP(userId, (expert.XpRequired * (-1)))
+	if err != nil {
+		return nil, err
+	}
+	err = s.appointmentRepository.UpdateTimeSlotAvailability(timeSlotId, false)
 	if err != nil {
 		return nil, err
 	}
