@@ -109,7 +109,6 @@ func (s *EvaluationService) EvaluateVoiceAnswer(userId string, req *request.Eval
 			XP:         xpGained,
 		}, nil
 	}
-	totalTimeTaken = totalTimeTaken / 1000
 	fmt.Println("Total time taken:", totalTimeTaken)
 	userProgress, err := s.userCourseService.GetUserProgress(userId)
 	if err != nil {
@@ -165,7 +164,6 @@ func (s *EvaluationService) EvaluateObjectiveAnswer(userId string, req *request.
 		}, nil
 	}
 
-	totalTimeTaken = totalTimeTaken / 1000
 	fmt.Println("Total time taken:", totalTimeTaken)
 	userProgress, err := s.userCourseService.GetUserProgress(userId)
 	if err != nil {
@@ -213,7 +211,9 @@ func (s *EvaluationService) EvaluateSubjectiveAnswer(userId string, req *request
 		if err != nil {
 			return nil, err
 		}
+		fmt.Println("Timestamp:", timestamp)
 		totalTimeTaken = time.Now().Unix() - timestamp
+		fmt.Println("Total time taken for section:", totalTimeTaken)
 		err = s.sectionRepo.DeleteSectionProgress(userId, question.SectionId)
 		if err != nil {
 			return nil, err
@@ -228,7 +228,7 @@ func (s *EvaluationService) EvaluateSubjectiveAnswer(userId string, req *request
 			XP:         userAnswerEvaluation.XPGained,
 		}, nil
 	}
-	totalTimeTaken = totalTimeTaken / 1000
+	fmt.Println("Total time taken for section:", totalTimeTaken)
 	fmt.Println("Total time taken:", totalTimeTaken)
 	userProgress, err := s.userCourseService.GetUserProgress(userId)
 	if err != nil {
